@@ -1,21 +1,21 @@
 import logging
 import os
 import time
+
+
+from dotenv import set_key
 from playwright.async_api import async_playwright, Playwright, Error
 import asyncio
 from fu import start_page_at_phone, create_proccess
 
-"""
-https://web.telegram.org/k/#@CaptainsBayBot
-"""
-
-PIRATE_BAY_URL = os.getenv("CAPTAINSBAY_URL")
 NAME = "captainsbay"
+TELEGRAM_URL = "https://web.telegram.org/k/#@CaptainsBayBot"
+URL = os.getenv(f"{NAME.upper()}_URL")
 TAP_PAUSE = 1000
 
 
 async def run(playwright: Playwright):
-    browser, page = await start_page_at_phone(url=PIRATE_BAY_URL, playwright=playwright)
+    browser, page = await start_page_at_phone(url=URL, playwright=playwright)
 
     while True:
         count = 0
@@ -49,6 +49,34 @@ async def process_captainsbay(ctx=None):
     return create_proccess(target=captainsbay)
 
 
+async def refresh_game_url(playwright: Playwright):
+    """
+    :param playwright:
+    :return: обновляем ссылки игр содержащих временный токен
+    """
+
+    browser, page = await start_page_at_phone(
+        url=TELEGRAM_URL,
+        mobile=False,
+        playwright=playwright,
+        browser_context={"storage_state": "web_telegram.json"}
+    )
+
+    time.sleep(1)
+    await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
+    await page.locator('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]/div[2]').click()
+    try:
+        await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # launch
+    except Error:
+        pass
+    iframe = await page.wait_for_selector('iframe')
+    src = await iframe.get_attribute('src')
+    set_key(dotenv_path=".env", key_to_set=NAME.upper() + "_URL", value_to_set=src)
+    await browser.close()
+
+
 if __name__ == '__main__':
-    from dotenv_config import l_dot_env
-    l_dot_env('../.env')
+    async def main():
+        async with async_playwright() as playwright:
+            await refresh_game_url(playwright)
+    asyncio.run(main())

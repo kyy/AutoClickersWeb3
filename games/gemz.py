@@ -1,20 +1,21 @@
 import logging
 import os
 import time
+
+import playwright
+from dotenv import set_key
 from playwright.async_api import async_playwright, Playwright, Error
 import asyncio
 from fu import start_page_at_phone, create_proccess
 
-
-COOKIES_FOLDER = r"C:\Users\xibolba\AppData\Local\Google\Chrome\User Data\Default"
-TELEGRAM_URL = "https://web.telegram.org/k/#@gemzcoin_bot"
-GEMZ_URL = os.getenv("GEMZ_URL")
 NAME = "gemz"
+TELEGRAM_URL = "https://web.telegram.org/k/#@gemzcoin_bot"
+URL = os.getenv(f"{NAME.upper()}_URL")
 TAP_PAUSE = 1000
 
 
 async def run(playwright: Playwright):
-    browser, page = await start_page_at_phone(url=GEMZ_URL, playwright=playwright)
+    browser, page = await start_page_at_phone(url=URL, playwright=playwright)
 
     try:
         await page.get_by_text("claim").tap()
@@ -53,40 +54,37 @@ async def process_gemz(ctx=None):
     return create_proccess(target=gemz)
 
 
+async def refresh_game_url(playwright: Playwright):
+    """
+    :param playwright:
+    :return: обновляем ссылки игр содержащих временный токен
+    """
+
+    browser, page = await start_page_at_phone(
+        url=TELEGRAM_URL,
+        mobile=False,
+        playwright=playwright,
+        browser_context={"storage_state": "web_telegram.json"}
+    )
+    time.sleep(1)
+    await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
+    await page.locator('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]/div[2]').click()
+    try:
+        await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # launch
+    except Error:
+        pass
+    iframe = await page.wait_for_selector('iframe')
+    src = await iframe.get_attribute('src')
+    set_key(dotenv_path=".env", key_to_set=NAME.upper() + "_URL", value_to_set=src)
+    await browser.close()
+
+
 if __name__ == '__main__':
-    from dotenv_config import l_dot_env
 
-    l_dot_env('../.env')
-    TELEGRAM_URL = "https://web.telegram.org/a/"
-    PHONE_NUMBER = "375291106914"
-
-    # async def get_refresh_url(playwright: Playwright):
-    #     phone = playwright.devices['Pixel 7']
-    #     browser = await playwright.chromium.launch(headless=False)
-    #     browser_mobile = await browser.new_context(**phone)
-    #     page = await browser_mobile.new_page()
-    #     await page.goto(TELEGRAM_URL)
-    #     time.sleep(7)
-    #     await page.locator('xpath=//*[@id="auth-qr-form"]/div/button[1]').tap()  # next
-    #     time.sleep(1)
-    #     number = page.locator('xpath=//*[@id="sign-in-phone-number"]')  # phone number
-    #     await number.clear()
-    #     await number.press_sequentially(PHONE_NUMBER)
-    #     await page.locator('xpath=//*[@id="auth-phone-number-form"]/div/form/button[1]/div').tap()  # next
-    #     await page.locator('xpath=//*[@id="sign-in-code"]').press_sequentially("CODE")
-    #     await page.pause()
-    #
-    #
-    #     # return print(await page.frame_locator("iframe").get_by_text("src").text_content())
-    #
-    #
-    # async def go(ctx=None):
-    #     async with async_playwright() as playwright:
-    #         await get_refresh_url(playwright)
-    #
-    # asyncio.run(go())
-
-
+    async def main():
+        async with async_playwright() as playwright:
+            await refresh_game_url(playwright)
+    asyncio.run(main())
 
 
 

@@ -1,32 +1,10 @@
 import logging
-import os
 
 from arq import cron, run_worker, Worker
 from arq.connections import RedisSettings
 
 from games.captainsbay import process_captainsbay
 from games.gemz import process_gemz
-
-
-PATH_TO_GAMES = "games"
-
-
-def games_fu():
-    """
-    :return: импортируем функции
-    """
-    files = os.listdir(PATH_TO_GAMES)
-    fu = [i.split(".")[0] for i in files if "__" not in i]
-
-    games = {}
-    for module_name in fu:
-        try:
-            module = __import__(PATH_TO_GAMES + "." + module_name)
-            func = getattr(module, module_name)
-            games[module_name] = func
-        except Exception as e:
-            logging.warning(f"не удалось импортировать i >> {e}")
-    return games
 
 
 class Work(Worker):

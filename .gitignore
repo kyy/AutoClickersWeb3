@@ -1,4 +1,6 @@
 .env
 .rdb
 .log
+.idea
 /logs
+web_telegram.json
