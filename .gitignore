@@ -4,3 +4,6 @@
 .idea
 /logs
 web_telegram.json
+__pyca
+*.pyc
+dump.rdb
