@@ -3,14 +3,11 @@ import logging
 import os
 import time
 
-import playwright.async_api
-from playwright.async_api import Playwright, async_playwright, Error
+from playwright.async_api import Playwright, async_playwright
 from multiprocessing import Process
 from dotenv import set_key
 
 from telethon.sync import TelegramClient
-from telethon.tl.functions.messages import GetDialogsRequest, GetHistoryRequest
-from telethon.tl.types import InputPeerEmpty
 from telethon.sessions import StringSession
 
 from dotenv_config import l_dot_env
@@ -67,7 +64,7 @@ def get_telegram_session():
             StringSession(),
             int(os.getenv("API_ID")),
             os.getenv("API_HASH"),
-    ).start(phone=os.getenv("PHONE")) as client:
+    ).start(phone=PHONE_NUMBER) as client:
         string = client.session.save()
         print(f"{string=}")
         set_key(dotenv_path=".env", key_to_set="SESSION_STRING", value_to_set=string)
@@ -93,9 +90,9 @@ async def get_telegram_storage_state(playwright: Playwright) -> None:
         await browser.close()
 
 
-def get_web_telegram_games_urls_names() -> list:
+def get_fu_refresh_game_urls_name() -> list:
     """
-    :return: получаем словарь с имененм игры и ссылкой web.telegram
+    :return: автоимпорт функции и имен игр
     """
     files = os.listdir(PATH_TO_GAMES)
     fu = [i.split(".")[0] for i in files if "__" not in i]
@@ -103,50 +100,59 @@ def get_web_telegram_games_urls_names() -> list:
     games = []
     for module_name in fu:
         try:
-            module = __import__(name=PATH_TO_GAMES + "." + module_name, fromlist=["refresh_game_url",])
-            fu_refresh = module.__dict__["refresh_game_url"]
-            games.append(fu_refresh)
+            module = __import__(name=PATH_TO_GAMES + "." + module_name, fromlist=["refresh_game_url", ])
+            fu = module.__dict__.get("refresh_game_url")
+            if fu is not None:
+                games.append((fu, module_name))
+            elif fu is None:
+                logging.warning(f"не удалось импортировать {module_name=} [{fu}]")
         except ImportError as e:
-            logging.warning(f"не удалось импортировать i >> {e}")
+            logging.warning(f"не удалось импортировать {module_name=} [{e}]")
     return games
 
 
-def get_telegram_chat():
-    string = os.getenv("SESSION_STRING")
-    api_id = int(os.getenv("API_ID"))
-    api_hash = os.getenv("API_HASH")
-    chat_id = 777000
-
-    with TelegramClient(StringSession(string), api_id, api_hash) as client:
-        client.connect()
-
-        # if not client.is_user_authorized():
-        #     client.send_code_request(phone_number)
-        #     me = client.sign_in(phone_number, input('Enter code: '))
-
-        channel_username = '@Telegram'  # your channel
-        channel_entity = client.get_entity(channel_username)
-        posts = client(
-            GetHistoryRequest(
-                peer=channel_entity,
-                limit=100,
-                offset_date=None,
-                offset_id=0,
-                max_id=0,
-                min_id=0,
-                add_offset=0,
-                hash=0,
-            )
-        )
-        print(posts)
-
-
 async def refresh_all_games_urls(playwright: Playwright):
-    [await fu(playwright) for fu in get_web_telegram_games_urls_names()]
+    for fu_name in get_fu_refresh_game_urls_name():
+        fu, name = fu_name
+        try:
+            src = await fu(playwright)
+
+            if src != "":
+                set_key(dotenv_path=".env", key_to_set=name.upper() + "_URL", value_to_set=src)
+            elif src == "":
+                logging.warning(f"Не удалось получить ссылку! {name=}")
+            logging.info(f"Ссылка обновлена {name=}")
+
+        except Exception as e:
+            logging.error(f"Ошибка при обновлении ссылки {name=} [{e}]")
+
+
+def get_fu_process() -> list:
+    """
+    :return: автоимпорт функции процессов и имен игр
+    """
+    files = os.listdir(PATH_TO_GAMES)
+    fu = [i.split(".")[0] for i in files if "__" not in i]
+
+    games = []
+    for module_name in fu:
+        try:
+            module = __import__(name=PATH_TO_GAMES + "." + module_name, fromlist=["cron_config", ])
+            fu = module.__dict__.get("cron_config")
+            if fu is not None:
+                games.append(fu)
+            elif fu is None:
+                logging.warning(f"не удалось импортировать {module_name=} [{fu}]")
+        except ImportError as e:
+            logging.warning(f"не удалось импортировать {module_name=} [{e}]")
+            continue
+    return games
+
 
 if __name__ == '__main__':
     async def main():
         async with async_playwright() as playwright:
             await refresh_all_games_urls(playwright)
+
 
     asyncio.run(main())
