@@ -1,7 +1,6 @@
 import logging
 import os
 import time
-from unicodedata import name
 
 from arq import cron
 from playwright.async_api import async_playwright, Playwright, Error
@@ -89,7 +88,7 @@ cron_config: cron = dict(
     coroutine=process,
     hour={i for i in range(1, 24, 3)},
     minute={00},
-    run_at_startup=True,
+    run_at_startup=False,
     max_tries=3,
     timeout=30 * 60,
     unique=True,
