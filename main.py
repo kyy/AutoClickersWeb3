@@ -17,7 +17,7 @@ class Work(Worker):
             run_at_startup=False,
             max_tries=3,
             timeout=30 * 60,
-            unique=True,
+            unique=False,
             name='refresh_urls',
             job_id=f'rfrsh_urls_001',
         ),
