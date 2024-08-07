@@ -14,7 +14,7 @@ class Work(Worker):
             coroutine=refresh_all_games_urls,
             hour={1},
             minute={1},
-            run_at_startup=True,
+            run_at_startup=False,
             max_tries=3,
             timeout=30 * 60,
             unique=True,

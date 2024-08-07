@@ -16,6 +16,8 @@ l_dot_env()
 
 TELEGRAM_URL = "https://web.telegram.org/a/"
 PHONE_NUMBER = os.getenv("PHONE")
+API_ID = int(os.getenv("API_ID"))
+API_HASH = os.getenv("API_HASH")
 STORAGE_STATE_NAME = "web_telegram.json"
 PATH_TO_GAMES = "games"
 
@@ -60,11 +62,7 @@ def create_proccess(target=None, ctx=None):
 
 
 def get_telegram_session():
-    with TelegramClient(
-            StringSession(),
-            int(os.getenv("API_ID")),
-            os.getenv("API_HASH"),
-    ).start(phone=PHONE_NUMBER) as client:
+    with TelegramClient(StringSession(), API_ID, API_HASH).start(phone=PHONE_NUMBER) as client:
         string = client.session.save()
         print(f"{string=}")
         set_key(dotenv_path=".env", key_to_set="SESSION_STRING", value_to_set=string)
@@ -118,10 +116,11 @@ async def refresh_all_games_urls(ctx=None):
         for fu_name in get_fu_refresh_game_urls_name():
             fu, name = fu_name
             try:
-                src = await fu(playwright)
+                src: str = await fu(playwright)
 
                 if src != "":
-                    set_key(dotenv_path=".env", key_to_set=name.upper() + "_URL", value_to_set=src)
+                    set_key(dotenv_path=".env", key_to_set=name.upper() + "_URL",
+                            value_to_set=src.replace("tgWebAppPlatform=web", "tgWebAppPlatform=ios"))
                 elif src == "":
                     logging.warning(f"<refresh_all_games_urls> Не удалось получить ссылку! {name=}")
                 logging.info(f"Ссылка обновлена {name=}")
@@ -142,7 +141,8 @@ def get_fu_process() -> list:
             try:
                 module = __import__(name=PATH_TO_GAMES + "." + module_name, fromlist=["cron_config", ])
                 fu = module.__dict__.get("cron_config")
-                games.append(fu)
+                if fu is not None:
+                    games.append(fu)
                 logging.info(f"{module_name=} импортирован [{fu}]")
             except ImportError as e:
                 logging.error(f"<get_fu_process()> не удалось импортировать {module_name=} [{e}]")

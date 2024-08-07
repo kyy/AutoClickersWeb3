@@ -1,13 +1,13 @@
 import logging
 import os
 import time
-
 from arq import cron
 from playwright.async_api import async_playwright, Playwright, Error
 import asyncio
 from fu import start_page_at_phone, create_proccess
+from games.__const import CRON_RUN_AT_STARTUP
 
-NAME = "gemz"
+NAME = __name__.split('.')[-1]
 TELEGRAM_URL = "https://web.telegram.org/k/#@gemzcoin_bot"
 URL = os.getenv(f"{NAME.upper()}_URL")
 TAP_PAUSE = 1000
@@ -19,11 +19,12 @@ async def run(playwright: Playwright):
     try:
         await page.get_by_text("claim").tap()
     except:
-        await browser.close()
+        await page.reload()
 
     try:
         await page.locator('xpath=//*[@id="root"]/div/div/div[1]/div/div/div/img').tap()  # закрыть окно с приглашением
     except:
+
         pass
 
     time.sleep(1)
@@ -88,7 +89,7 @@ cron_config: cron = dict(
     coroutine=process,
     hour={i for i in range(1, 24, 3)},
     minute={00},
-    run_at_startup=False,
+    run_at_startup=CRON_RUN_AT_STARTUP,
     max_tries=3,
     timeout=30 * 60,
     unique=True,
