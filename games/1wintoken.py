@@ -16,24 +16,25 @@ TAP_PAUSE = 1000
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
 
-    await page.locator('//*[@id="root"]/div[1]/div/button').tap(force=True)  # continue
-    time.sleep(0.25)
-    await page.locator('//*[@id="root"]/div[1]/div/button').tap(force=True)  # continue
-    time.sleep(0.25)
-    await page.locator('//*[@id="root"]/div[1]/div/button').tap(force=True)  # continue
-    time.sleep(1)
+    await page.locator('//*[@id="root"]/div[1]/div/button').tap(force=True, timeout=250)  # continue
+
+    await page.locator('//*[@id="root"]/div[1]/div/button').tap(force=True, timeout=250)  # continue
+
+    await page.locator('//*[@id="root"]/div[1]/div/button').tap(force=True, timeout=250)  # continue
+
     try:
-        await page.locator('//*[@id="root"]/div[3]/div/div/div[4]/div/button').tap(force=True)  # get money
+        await page.locator('//*[@id="root"]/div[3]/div/div/div[4]/div/button').tap(force=True,
+                                                                                   timeout=1000)  # get money
     except:
         pass
-    time.sleep(1)
+
     try:
-        await page.locator('//*[@id="root"]/div[3]/div/div/div[4]/div/button').tap(force=True)  # close
+        await page.locator('//*[@id="root"]/div[3]/div/div/div[4]/div/button').tap(force=True, timeout=1000)  # close
     except:
         pass
-    time.sleep(1)
+    await asyncio.sleep(0.15)
     try:
-        await page.locator('//*[@id="root"]/div[3]/div/div/div[4]/div/button').tap(force=True)  # close
+        await page.locator('//*[@id="root"]/div[3]/div/div/div[4]/div/button').tap(force=True, timeout=1000)  # close
     except:
         pass
     while True:
@@ -79,18 +80,18 @@ async def refresh_game_url(playwright: Playwright):
         playwright=playwright,
         browser_context={"storage_state": "web_telegram.json"}
     )
-    time.sleep(1)
+
     await page.wait_for_selector(
         'xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
     await page.locator(
-        'xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]').click()  # burger
-    time.sleep(0.25)
+        'xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]').click(timeout=1500)  # burger
     await page.locator(
-        'xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[1]/div/div[2]/div/div[3]').click()  # start
-    time.sleep(0.25)
+        'xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[1]/div/div[2]/div/div[3]').click(
+        timeout=1500)  # start
     await page.locator(
-        'xpath=//*[@class="bubbles-group bubbles-group-last"]/div/div/div[2]/div[1]/button/div').click()  # run
-    time.sleep(0.25)
+        'xpath=//*[@class="bubbles-group bubbles-group-last"]/div/div/div[2]/div[1]/button/div').click(
+        timeout=1500)  # run
+
     await page.locator(
         'xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # accept run
 

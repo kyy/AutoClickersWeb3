@@ -15,19 +15,16 @@ TAP_PAUSE = 1000
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
+    await page.wait_for_selector('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]')
+    await page.locator('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]/div').tap(force=True, timeout=3000)
 
     try:
-        await page.get_by_text("claim").tap()
+        await page.locator('xpath=//*[@id="root"]/div/div/div[1]/div/div/div/img').tap(force=True,
+                                                                                       timeout=1000)  # закрыть окно с приглашением
     except:
-        await page.reload()
-
-    try:
-        await page.locator('xpath=//*[@id="root"]/div/div/div[1]/div/div/div/img').tap()  # закрыть окно с приглашением
-    except:
-
         pass
 
-    time.sleep(1)
+    await asyncio.sleep(1)
 
     while True:
         count = 0
@@ -72,11 +69,12 @@ async def refresh_game_url(playwright: Playwright):
         playwright=playwright,
         browser_context={"storage_state": "web_telegram.json"}
     )
-    time.sleep(1)
+    await asyncio.sleep(0.5)
     await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
-    await page.locator('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]/div[2]').click()
+    await page.locator('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]/div[2]').click(
+        force=True, timeout=3)
     try:
-        await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # launch
+        await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click(force=True, timeout=1)  # launch
     except Error:
         pass
     iframe = await page.wait_for_selector('iframe')
@@ -89,7 +87,7 @@ cron_config: cron = dict(
     coroutine=process,
     hour={i for i in range(1, 24, 3)},
     minute={00},
-    run_at_startup=CRON_RUN_AT_STARTUP,
+    run_at_startup=True,
     max_tries=3,
     timeout=30 * 60,
     unique=True,

@@ -65,9 +65,10 @@ async def refresh_game_url(playwright: Playwright):
     )
     time.sleep(1)
     await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
-    await page.locator('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]/div[2]').click()
+    await page.locator('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]/div[2]').click(
+        force=True, timeout=3)
     try:
-        await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # launch
+        await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click(force=True, timeout=1000)  # launch
     except Error:
         pass
     iframe = await page.wait_for_selector('iframe')

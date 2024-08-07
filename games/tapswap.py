@@ -17,7 +17,7 @@ TAP_PAUSE = 1000
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     try:
-        await page.locator('//*[@id="app"]/div[2]/button').tap(force=True, timeout=1)  # getit
+        await page.locator('//*[@id="app"]/div[2]/button').tap(force=True, timeout=1000)  # getit
     except:
         pass
     await asyncio.sleep(0.1)
@@ -27,7 +27,6 @@ async def run(playwright: Playwright):
         for i in range(TAP_PAUSE):
             energy_current = await page.locator(
                 '//*[@id="app"]/div[1]/div[3]/div/div[1]/div/div[1]/div[2]/h4').text_content()
-            print(energy_current)
             count += 1
 
             await page.locator('//*[@id="ex1-layer"]').tap(force=True)
@@ -85,7 +84,7 @@ cron_config: cron = dict(
     coroutine=process,
     hour=None,
     minute={30},
-    run_at_startup=True,
+    run_at_startup=CRON_RUN_AT_STARTUP,
     max_tries=3,
     timeout=30 * 60,
     unique=True,

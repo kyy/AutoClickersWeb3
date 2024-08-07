@@ -50,7 +50,6 @@ async def start_page_at_phone(playwright: Playwright, url: str, browser_context:
     browser_mobile = await browser.new_context(**context)
     page = await browser_mobile.new_page()
     await page.goto(url)
-    await asyncio.sleep(5)
     return browser, page
 
 
