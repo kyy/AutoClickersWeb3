@@ -6,7 +6,7 @@ from arq import cron
 from playwright.async_api import async_playwright, Playwright, Error
 import asyncio
 from fu import start_page_at_phone, create_proccess
-from games.__const import CRON_RUN_AT_STARTUP
+from games.__const import CRON_RUN_AT_STARTUP_URL, CRON_RUN_AT_STARTUP_TAP
 
 NAME = __name__.split('.')[-1]
 TELEGRAM_URL = "https://web.telegram.org/k/#@tapswap_mirror_bot"
@@ -55,36 +55,40 @@ async def process(ctx=None):
     return create_proccess(target=game)
 
 
-async def refresh_game_url(playwright: Playwright):
+async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
     """
     :param playwright:
     :return: обновляем ссылки игр содержащих временный токен
     """
+    if run is True:
+        browser, page = await start_page_at_phone(
+            url=TELEGRAM_URL,
+            mobile=False,
+            playwright=playwright,
+            browser_context={"storage_state": "web_telegram.json"},
+            timeout=10,
+        )
 
-    browser, page = await start_page_at_phone(
-        url=TELEGRAM_URL,
-        mobile=False,
-        playwright=playwright,
-        browser_context={"storage_state": "web_telegram.json"}
-    )
-    time.sleep(1)
-    await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
-    await page.locator('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]/div[2]').click()
-    try:
-        await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # launch
-    except Error:
-        pass
-    iframe = await page.wait_for_selector('iframe')
-    src = await iframe.get_attribute('src')
-    await browser.close()
-    return src
+        await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
+        await page.locator('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]/div[2]').click(
+            timeout=1000)
+        try:
+            await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # launch
+        except Error:
+            pass
+        iframe = await page.wait_for_selector('iframe')
+        src = await iframe.get_attribute('src')
+        await browser.close()
+        return src
+    elif run is False:
+        return False
 
 
 cron_config: cron = dict(
     coroutine=process,
     hour=None,
     minute={30},
-    run_at_startup=CRON_RUN_AT_STARTUP,
+    run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,
     timeout=30 * 60,
     unique=True,

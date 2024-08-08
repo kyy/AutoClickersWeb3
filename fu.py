@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import os
 import time
 
@@ -22,25 +21,7 @@ STORAGE_STATE_NAME = "web_telegram.json"
 PATH_TO_GAMES = "games"
 
 
-def games_fu():
-    """
-    :return: импортируем функции
-    """
-    files = os.listdir(PATH_TO_GAMES)
-    fu = [i.split(".")[0] for i in files if "__" not in i]
-
-    games = {}
-    for module_name in fu:
-        try:
-            module = __import__(PATH_TO_GAMES + "." + module_name)
-            func = getattr(module, module_name)
-            games[module_name] = func
-        except Exception as e:
-            logging.warning(f"<games_fu> не удалось импортировать {module_name=} [{e}]")
-    return games
-
-
-async def start_page_at_phone(playwright: Playwright, url: str, browser_context: dict = None, mobile=True):
+async def start_page_at_phone(playwright: Playwright, url: str, browser_context: dict = None, mobile=True, timeout=5):
     context = {}
     if mobile:
         context = playwright.devices['Pixel 7']
@@ -50,6 +31,7 @@ async def start_page_at_phone(playwright: Playwright, url: str, browser_context:
     browser_mobile = await browser.new_context(**context)
     page = await browser_mobile.new_page()
     await page.goto(url)
+    time.sleep(timeout)
     return browser, page
 
 
@@ -93,6 +75,7 @@ def get_fu_refresh_game_urls_name() -> list:
     """
     files = os.listdir(PATH_TO_GAMES)
     funcs = [i.split(".")[0] for i in files if "__" not in i]
+    print(funcs)
 
     games = []
     for module_name in funcs:
@@ -100,32 +83,36 @@ def get_fu_refresh_game_urls_name() -> list:
             try:
                 module = __import__(name=PATH_TO_GAMES + "." + module_name, fromlist=["refresh_game_url", ])
                 fu = module.__dict__.get("refresh_game_url")
-                if fu is not None:
+                if fu is not None and fu is not False:
                     games.append((fu, module_name))
+                    print(f" импортирован <refresh_game_url> {module_name=}")
                 elif fu is None:
-                    logging.warning(f"<get_fu_refresh_game_urls_name> не удалось импортировать {module_name=} [{fu}]")
+                    print(f"<get_fu_refresh_game_urls_name> не удалось импортировать {module_name=} [{fu}]")
             except ImportError as e:
-                logging.warning(f"<get_fu_refresh_game_urls_name> не удалось импортировать {module_name=} [{e}]")
+                print(f"<get_fu_refresh_game_urls_name> не удалось импортировать {module_name=} [{e}]")
     return games
 
 
 async def refresh_all_games_urls(ctx=None):
     async with async_playwright() as playwright:
-
         for fu_name in get_fu_refresh_game_urls_name():
             fu, name = fu_name
             try:
                 src: str = await fu(playwright)
 
-                if src != "":
+                if src != "" and src is not False:
                     set_key(dotenv_path=".env", key_to_set=name.upper() + "_URL",
                             value_to_set=src.replace("tgWebAppPlatform=web", "tgWebAppPlatform=ios"))
+                    print(f"Ссылка обновлена {name=}")
                 elif src == "":
-                    logging.warning(f"<refresh_all_games_urls> Не удалось получить ссылку! {name=}")
-                logging.info(f"Ссылка обновлена {name=}")
+                    print(f"<refresh_all_games_urls> Не удалось получить ссылку! {name=}...")
+                elif src is False:
+                    print(f"Обновление ссылки отключено {name=}")
+
+
 
             except Exception as e:
-                logging.error(f"Ошибка при обновлении ссылки {name=} [{e}]")
+                print(f"Ошибка при обновлении ссылки {name=} [{e}]")
 
 
 def get_fu_process() -> list:
@@ -142,9 +129,9 @@ def get_fu_process() -> list:
                 fu = module.__dict__.get("cron_config")
                 if fu is not None:
                     games.append(fu)
-                logging.info(f"{module_name=} импортирован [{fu}]")
+                print(f"{module_name=} <cron_config> импортирован")
             except ImportError as e:
-                logging.error(f"<get_fu_process()> не удалось импортировать {module_name=} [{e}]")
+                print(f"<get_fu_process()> не удалось импортировать {module_name=} [{e}]")
                 continue
     return games
 
