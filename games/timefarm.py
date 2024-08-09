@@ -19,8 +19,8 @@ async def run(playwright: Playwright):
     try:
         await page.locator('//*[@id="app"]/div/div[1]/div[4]').tap(force=True)  # claim
     except:
-        await page.reload()
-
+        pass
+    time.sleep(5)
     try:
         await page.locator('//*[@id="app"]/div/div[1]/div[4]').tap(force=True, timeout=3000)  # claim
     except:
@@ -75,7 +75,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(1, 24, 4)},
+    hour={i for i in range(0, 25, 4)},
     minute={45},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,

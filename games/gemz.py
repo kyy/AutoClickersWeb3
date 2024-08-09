@@ -16,13 +16,12 @@ TAP_PAUSE = 1000
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     await page.wait_for_selector('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]')
-    await page.locator('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]/div').tap(force=True, timeout=3000)
+    await page.locator('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]/div').tap(force=True, timeout=1500)
 
     try:
         await page.locator('xpath=//*[@id="root"]/div/div/div[1]/div/div/div/img').tap(force=True,
-                                                                                       timeout=1000)  # закрыть окно с приглашением
+                                                                                       imeout=1500)  # закрыть окно с приглашением
     except:
-        await page.reload()
         pass
 
     while True:
@@ -94,7 +93,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(1, 24, 3)},
+    hour={i for i in range(0, 25, 1)},
     minute={5},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,

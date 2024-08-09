@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 
 from arq import cron
 from playwright.async_api import async_playwright, Playwright, Error
@@ -19,13 +20,13 @@ async def run(playwright: Playwright):
     try:
         await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap()  # clime
     except:
-        await page.reload()
-        await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap()  # clime
 
+        await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap()  # clime
+    time.sleep(10)
     try:
         await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap()  # start mining
     except:
-        await page.reload()
+
         await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap(timeout=5000)  # start mining
 
 
@@ -76,7 +77,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(1, 24, 4)},
+    hour={i for i in range(0, 25, 4)},
     minute={00},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,
