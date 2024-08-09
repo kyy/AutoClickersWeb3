@@ -4,7 +4,7 @@ import time
 from arq import cron
 from playwright.async_api import async_playwright, Playwright, Error
 import asyncio
-from fu import start_page_at_phone, create_proccess
+from fu import start_page_at_phone, create_proccess, multy_tap
 from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 
 NAME = __name__.split('.')[-1]
@@ -22,20 +22,27 @@ async def run(playwright: Playwright):
         await page.locator('xpath=//*[@id="root"]/div/div/div[1]/div/div/div/img').tap(force=True,
                                                                                        timeout=1000)  # закрыть окно с приглашением
     except:
+        await page.reload()
         pass
-
-    await asyncio.sleep(1)
 
     while True:
         count = 0
         for i in range(TAP_PAUSE):
             energy_current = await page.locator(
                 'xpath=//*[@id="root"]/div/div/div[2]/footer/div[1]/div[1]/div[1]/div[2]/span[1]').text_content()
+
+            await multy_tap(
+                page=page,
+                semaphore=10,
+                taps=10,
+                locator='//*[@id="coin"]/div[1]',
+            )
+
             count += 1
-            await page.locator('xpath=//*[@id="coin"]/div[1]').tap(force=True)
+
             if count == TAP_PAUSE - 1:
                 time.sleep(1)
-            if energy_current[0] == "1":
+            if int(energy_current) < 10:
                 time.sleep(1)
                 await browser.close()
                 return True
