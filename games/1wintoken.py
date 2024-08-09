@@ -79,7 +79,6 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
             mobile=False,
             playwright=playwright,
             browser_context={"storage_state": "web_telegram.json"},
-            timeout=10,
         )
 
         await page.wait_for_selector(

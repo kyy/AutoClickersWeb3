@@ -1,6 +1,5 @@
 import logging
 import os
-import time
 
 from arq import cron
 from playwright.async_api import async_playwright, Playwright, Error
@@ -15,24 +14,19 @@ TAP_PAUSE = 1000
 
 
 async def run(playwright: Playwright):
-    browser, page = await start_page_at_phone(url=URL, playwright=playwright)
+    browser, page = await start_page_at_phone(url=URL, playwright=playwright, timeout=2)
 
-    while True:
-        count = 0
-        for i in range(TAP_PAUSE):
-            energy_current = await page.locator(
-                'xpath=//*[@id="app"]/div/div/div/main/div[1]/div/div[4]/div/div[3]/span[1]/span[2]/span[1]'
-            ).text_content()
-            count += 1
+    try:
+        await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap()  # clime
+    except:
+        await page.reload()
+        await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap()  # clime
 
-            await page.locator('//*[@id="tap-zone"]/div[1]/div').tap(force=True)
-
-            if count == TAP_PAUSE - 1:
-                time.sleep(1)
-            if energy_current == "1":
-                time.sleep(1)
-                await browser.close()
-                return True
+    try:
+        await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap()  # start mining
+    except:
+        await page.reload()
+        await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap(timeout=5000)  # start mining
 
 
 async def main(ctx=None):
@@ -62,7 +56,6 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
             mobile=False,
             playwright=playwright,
             browser_context={"storage_state": "web_telegram.json"},
-            timeout=10,
         )
 
         await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
@@ -83,7 +76,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(1, 24, 3)},
+    hour={i for i in range(1, 24, 4)},
     minute={00},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,

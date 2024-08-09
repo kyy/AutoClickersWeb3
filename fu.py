@@ -75,7 +75,6 @@ def get_fu_refresh_game_urls_name() -> list:
     """
     files = os.listdir(PATH_TO_GAMES)
     funcs = [i.split(".")[0] for i in files if "__" not in i]
-    print(funcs)
 
     games = []
     for module_name in funcs:
