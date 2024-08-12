@@ -16,7 +16,6 @@ cron_j.append(
         job_id=f'rfrsh_urls_001',
     ),
 )
-print()
 
 
 class Work(Worker):
