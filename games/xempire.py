@@ -5,21 +5,38 @@ import time
 from arq import cron
 from playwright.async_api import async_playwright, Playwright, Error
 import asyncio
-from fu import start_page_at_phone, create_proccess, get_canonic_full_game_url
+from fu import start_page_at_phone, create_proccess, multy_tap, get_canonic_full_game_url
 from games.__const import CRON_RUN_AT_STARTUP_URL, CRON_RUN_AT_STARTUP_TAP
 
 NAME = __name__.split('.')[-1]
-TELEGRAM_URL = "https://web.telegram.org/k/#@tapswap_mirror_bot"
+TELEGRAM_URL = "https://web.telegram.org/k/#@muskempire_bot"
 URL = os.getenv(f"{NAME.upper()}_URL")
 TAP_PAUSE = 1000
 
 
 async def run(playwright: Playwright):
-    browser, page = await start_page_at_phone(url=URL, playwright=playwright)
+    browser, page = await start_page_at_phone(url=URL, playwright=playwright, timeout=3)
+
     try:
-        await page.locator('//*[@id="app"]/div[2]/div[3]/button').tap(force=True, timeout=1000)  # getit
+        await page.get_by_text('Забрать').tap()  # clime
     except:
         pass
+
+    while True:
+        count = 0
+        energy_current = 2500 / 92
+
+        await page.locator('//*[@id="oreol"]').tap()
+        energy_current -= 1
+
+        count += 1
+
+        if count == TAP_PAUSE - 1:
+            time.sleep(1)
+        if int(energy_current) < 10:
+            time.sleep(1)
+            await browser.close()
+            return True
 
 
 async def main(ctx=None):
@@ -57,11 +74,11 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 2)},
-    minute={35},
+    hour={i for i in range(0, 25, 4)},
+    minute={55},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,
-    timeout=30 * 60,
+    timeout=10 * 60,
     unique=True,
     name=NAME,
     job_id=f'{NAME}_001',
