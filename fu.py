@@ -146,5 +146,23 @@ async def multy_tap(page: async_playwright, taps: int, locator: str, semaphore: 
     await asyncio.gather(*task_tap)
 
 
+async def get_canonic_full_game_url(page, browser):
+    """
+    :param playwright:
+    :return: обновляем ссылки игр содержащих временный токен
+    """
+
+    await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
+
+    await page.locator('//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]').click()  # burger
+
+    await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # launch
+
+    iframe = await page.wait_for_selector('iframe')
+    src = await iframe.get_attribute('src')
+    await browser.close()
+    return src
+
+
 if __name__ == '__main__':
     pass
