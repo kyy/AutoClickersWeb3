@@ -50,7 +50,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
             playwright=playwright,
             browser_context={"storage_state": "web_telegram.json"},
         )
-        return get_canonic_full_game_url(page, browser)
+        return await get_canonic_full_game_url(page, browser)
     elif run is False:
         return False
 

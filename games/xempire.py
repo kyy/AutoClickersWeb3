@@ -24,7 +24,7 @@ async def run(playwright: Playwright):
 
     while True:
         count = 0
-        energy_current = 2500 / 92
+        energy_current = 100
 
         await page.locator('//*[@id="oreol"]').tap()
         energy_current -= 1
@@ -33,7 +33,7 @@ async def run(playwright: Playwright):
 
         if count == TAP_PAUSE - 1:
             time.sleep(1)
-        if int(energy_current) < 10:
+        if int(energy_current) < 100:
             time.sleep(1)
             await browser.close()
             return True
@@ -67,7 +67,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
             playwright=playwright,
             browser_context={"storage_state": "web_telegram.json"},
         )
-        return get_canonic_full_game_url(page, browser)
+        return await get_canonic_full_game_url(page, browser)
     elif run is False:
         return False
 

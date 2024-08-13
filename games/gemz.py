@@ -16,11 +16,11 @@ TAP_PAUSE = 1000
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     await page.wait_for_selector('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]')
-    await page.locator('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]/div').tap(force=True, timeout=1500)
+    await page.locator('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]/div').tap(force=True)
 
     try:
-        await page.locator('xpath=//*[@id="root"]/div/div/div[1]/div/div/div/img').tap(force=True,
-                                                                                       imeout=1500)  # закрыть окно с приглашением
+        await page.locator('xpath=//*[@id="root"]/div/div/div[1]/div/div/div/img').tap(
+            force=True)  # закрыть окно с приглашением
     except:
         pass
 
@@ -75,7 +75,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
             playwright=playwright,
             browser_context={"storage_state": "web_telegram.json"},
         )
-        return get_canonic_full_game_url(page, browser)
+        return await get_canonic_full_game_url(page, browser)
     elif run is False:
         return False
 
