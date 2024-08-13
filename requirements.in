@@ -3,3 +3,4 @@ python-dotenv
 arq
 playwright
 telethon
+tqdm

@@ -8,6 +8,7 @@ from dotenv import set_key
 
 from telethon.sync import TelegramClient
 from telethon.sessions import StringSession
+from tqdm import tqdm
 
 from dotenv_config import l_dot_env
 
@@ -77,7 +78,7 @@ def get_fu_refresh_game_urls_name() -> list:
     funcs = [i.split(".")[0] for i in files if "__" not in i]
 
     games = []
-    for module_name in funcs:
+    for module_name in tqdm(funcs, desc='get_fu_refresh_game_urls_name'):
         if module_name != "":
             try:
                 module = __import__(name=PATH_TO_GAMES + "." + module_name, fromlist=["refresh_game_url", ])
@@ -94,7 +95,7 @@ def get_fu_refresh_game_urls_name() -> list:
 
 async def refresh_all_games_urls(ctx=None):
     async with async_playwright() as playwright:
-        for fu_name in get_fu_refresh_game_urls_name():
+        for fu_name in tqdm(get_fu_refresh_game_urls_name(), desc='refresh_all_games_urls'):
             fu, name = fu_name
             try:
                 src: str = await fu(playwright)
@@ -121,14 +122,13 @@ def get_fu_process() -> list:
     files = os.listdir(PATH_TO_GAMES)
     funcs = [i.split(".")[0] for i in files if "__" not in i]
     games = []
-    for module_name in funcs:
+    for module_name in tqdm(funcs, desc='get_fu_process'):
         if module_name != "":
             try:
                 module = __import__(name=PATH_TO_GAMES + "." + module_name, fromlist=["cron_config", ])
                 fu = module.__dict__.get("cron_config")
                 if fu is not None:
                     games.append(fu)
-                print(f"{module_name=} <cron_config> импортирован")
             except ImportError as e:
                 print(f"<get_fu_process()> не удалось импортировать {module_name=} [{e}]")
                 continue
@@ -153,11 +153,8 @@ async def get_canonic_full_game_url(page, browser):
     """
 
     await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
-
     await page.locator('//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]').click()  # burger
-
     await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # launch
-
     iframe = await page.wait_for_selector('iframe')
     src = await iframe.get_attribute('src')
     await browser.close()

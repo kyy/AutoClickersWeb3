@@ -16,6 +16,7 @@ colorama==0.4.6
     # via
     #   build
     #   click
+    #   tqdm
 greenlet==3.0.3
     # via playwright
 hiredis==3.0.0
@@ -43,6 +44,8 @@ redis[hiredis]==4.6.0
 rsa==4.9
     # via telethon
 telethon==1.36.0
+    # via -r requirements.in
+tqdm==4.66.5
     # via -r requirements.in
 typing-extensions==4.12.2
     # via pyee
