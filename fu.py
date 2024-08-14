@@ -28,7 +28,7 @@ async def start_page_at_phone(playwright: Playwright, url: str, browser_context:
         context = playwright.devices['Pixel 7']
     if browser_context:
         context.update(**browser_context)
-    browser = await playwright.chromium.launch(headless=False)
+    browser = await playwright.chromium.launch(headless=True)
     browser_mobile = await browser.new_context(**context)
     page = await browser_mobile.new_page()
     await page.goto(url)
@@ -91,28 +91,6 @@ def get_fu_refresh_game_urls_name() -> list:
             except ImportError as e:
                 print(f"<get_fu_refresh_game_urls_name> не удалось импортировать {module_name=} [{e}]")
     return games
-
-
-async def refresh_all_games_urls(ctx=None):
-    async with async_playwright() as playwright:
-        for fu_name in tqdm(get_fu_refresh_game_urls_name(), desc='refresh_all_games_urls'):
-            fu, name = fu_name
-            try:
-                src: str = await fu(playwright)
-
-                if src != "" and src is not False:
-                    set_key(dotenv_path=".env", key_to_set=name.upper() + "_URL",
-                            value_to_set=src.replace("tgWebAppPlatform=web", "tgWebAppPlatform=ios"))
-                    print(f"Ссылка обновлена {name=}")
-                elif src == "":
-                    print(f"<refresh_all_games_urls> Не удалось получить ссылку! {name=}...")
-                elif src is False:
-                    print(f"Обновление ссылки отключено {name=}")
-
-
-
-            except Exception as e:
-                print(f"Ошибка при обновлении ссылки {name=} [{e}]")
 
 
 def get_fu_process() -> list:
