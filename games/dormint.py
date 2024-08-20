@@ -19,13 +19,14 @@ async def run(playwright: Playwright):
     try:
         await page.locator('//*[@id="root"]/div/div/div/div[2]/div/div/button').tap(force=True)  # claim
     except:
-        await page.reload()
-    time.sleep(10)
+        await browser.close()
+    time.sleep(8)
     try:
         await page.get_by_text('Start sleeping').tap()  # claim
     except:
         pass
-    time.sleep(5)
+    time.sleep(2)
+    await browser.close()
 
 
 async def main(ctx=None):

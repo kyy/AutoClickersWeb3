@@ -24,7 +24,7 @@ async def run(playwright: Playwright):
     try:
         await page.locator('//*[@id="app"]/div/div[1]/div[4]').tap(force=True, timeout=3000)  # claim
     except:
-        pass
+        await browser.close()
 
 
 async def main(ctx=None):

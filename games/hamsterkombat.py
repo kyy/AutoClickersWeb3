@@ -20,7 +20,7 @@ async def run(playwright: Playwright):
     try:
         await page.locator('//*[@id="__nuxt"]/div/div[3]/div[2]/div[2]/div/button').tap()  # clime
     except:
-        pass
+        await browser.close()
 
     while True:
         count = 0

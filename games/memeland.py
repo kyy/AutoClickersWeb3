@@ -25,7 +25,7 @@ async def run(playwright: Playwright):
     try:
         await page.locator('//*[@id="root"]/div/div[2]/div/div[3]/button').tap()  # clime
     except:
-        pass
+        await browser.close()
 
     await page.get_by_text("Play").tap()
 

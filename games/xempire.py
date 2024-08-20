@@ -20,7 +20,7 @@ async def run(playwright: Playwright):
     try:
         await page.get_by_text('Забрать').tap()  # clime
     except:
-        pass
+        await browser.close()
 
     while True:
         count = 0

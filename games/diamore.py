@@ -19,21 +19,21 @@ async def run(playwright: Playwright):
     try:
         await page.get_by_text('Tap to start game').tap()  # start game
     except:
-        pass
+        await browser.close()
     time.sleep(0.5)
 
     while True:
         try:
             await multy_tap(
                 page=page,
-                semaphore=5,
-                taps=5,
+                semaphore=3,
+                taps=3,
                 locator='//*[@id="root"]/div/div[2]/div[1]/div/div[3]/span',
             )
         except:
             time.sleep(1)
+
             await browser.close()
-            return True
 
 
 async def main(ctx=None):

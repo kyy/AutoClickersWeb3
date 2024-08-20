@@ -28,6 +28,8 @@ async def run(playwright: Playwright):
     except:
 
         await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap(timeout=5000)  # start mining
+    time.sleep(2)
+    await browser.close()
 
 
 async def main(ctx=None):
