@@ -18,6 +18,12 @@ async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright, timeout=3)
 
     try:
+        await page.locator('//*[@id="root"]/div[3]/button').tap()  # X
+    except:
+        pass
+    time.sleep(1)
+
+    try:
         await page.locator('//*[@id="root"]/div/div[2]/div/div[3]/button').tap()  # clime
     except:
         pass
