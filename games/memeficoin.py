@@ -36,16 +36,6 @@ async def run(playwright: Playwright):
 
     time.sleep(1)
 
-    # booster_button = await page.locator('//*[@id="root"]/main/div/div/div[6]/div[2]/div/button[1]').tap()
-    # time.sleep(2)
-    #
-    # autofarm_count = await page.locator(
-    #     '//*[@id="root"]/main/div/div/div[2]/div[2]/div/div[1]/div[2]/div/div/span[2]').text_content()
-    # autofarm_count = int(autofarm_count.split(" ")[0])
-    #
-    # autofarm_button = await page.locator('//*[@id="root"]/main/div/div/div[2]/div[2]/div/div[1]').tap()
-    # time.sleep(2)
-
     while True:
         count = 0
         for i in range(TAP_PAUSE):
@@ -66,6 +56,25 @@ async def run(playwright: Playwright):
                 time.sleep(1)
             if int(energy_current) < 10:
                 time.sleep(1)
+
+                booster_button = await page.locator('//*[@id="root"]/main/div/div/div[6]/div[2]/div/button[1]').tap()
+                time.sleep(1)
+
+                autofarm_count = await page.locator(
+                    '//*[@id="root"]/main/div/div/div[2]/div[2]/div/div[1]/div[2]/div/div/span[2]').text_content()
+                autofarm_count = int(autofarm_count.split(" ")[0])
+                autofarm_current_money = await page.locator(
+                    '//*[@id="root"]/main/div/div/div[2]/div[2]/div/div[1]/div[2]/div/div/span[1]').all_text_contents()  # ['259,200 / 259,200']
+
+                if autofarm_current_money[0] == '259,200 / 259,200':
+                    autofarm_button = await page.locator('//*[@id="root"]/main/div/div/div[2]/div[2]/div/div[1]').tap()
+                    time.sleep(2)
+                    clime_money = await page.get_by_text('клейм монет').tap()
+                elif autofarm_count > 0 and autofarm_current_money[0] == '+259,200':
+                    autofarm_button = await page.locator('//*[@id="root"]/main/div/div/div[2]/div[2]/div/div[1]').tap()
+                    time.sleep(2)
+                    clime_money = await page.get_by_role("button", name="Активировать бота").tap()
+                time.sleep(2)
                 await browser.close()
                 return True
 
