@@ -103,11 +103,14 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
             'xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]').click()  # burger
         await page.locator(
             'xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[1]/div/div[2]/div/div[3]').click()  # start
+        time.sleep(2)
         await page.locator(
             'xpath=//*[@class="bubbles-group bubbles-group-last"]/div/div/div[2]/div[1]/button/div').click()  # run
-
+        time.sleep(2)
         await page.locator(
             'xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # accept run
+
+        time.sleep(2)
 
         iframe = await page.wait_for_selector('iframe')
         src = await iframe.get_attribute('src')

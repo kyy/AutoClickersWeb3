@@ -40,7 +40,7 @@ async def run(playwright: Playwright):
         count = 0
         for i in range(TAP_PAUSE):
             energy_current = await page.locator(
-                '//*[@id="root"]/main/div/div/div[6]/div[1]/div[2]/div/span[1]').text_content()
+                '//*[@id="root"]/main/div/div/div[7]/div[1]/div[2]/div/span[1]').text_content()
             energy_current = energy_current.replace(",", "")
 
             await multy_tap(
@@ -57,20 +57,20 @@ async def run(playwright: Playwright):
             if int(energy_current) < 10:
                 time.sleep(1)
 
-                booster_button = await page.locator('//*[@id="root"]/main/div/div/div[6]/div[2]/div/button[1]').tap()
+                booster_button = await page.locator('//*[@id="root"]/main/div/div/div[7]/div[2]/div/button[1]').tap()
                 time.sleep(1)
 
                 autofarm_count = await page.locator(
                     '//*[@id="root"]/main/div/div/div[2]/div[2]/div/div[1]/div[2]/div/div/span[2]').text_content()
                 autofarm_count = int(autofarm_count.split(" ")[0])
                 autofarm_current_money = await page.locator(
-                    '//*[@id="root"]/main/div/div/div[2]/div[2]/div/div[1]/div[2]/div/div/span[1]').all_text_contents()  # ['259,200 / 259,200']
+                    '//*[@id="root"]/main/div/div/div[2]/div[2]/div/div[1]/div[2]/div/div/span[1]').all_text_contents()  # ['324,000 / 324,000']
 
-                if autofarm_current_money[0] == '259,200 / 259,200':
+                if autofarm_current_money[0] == '324,000 / 324,000':
                     autofarm_button = await page.locator('//*[@id="root"]/main/div/div/div[2]/div[2]/div/div[1]').tap()
                     time.sleep(2)
                     clime_money = await page.get_by_text('клейм монет').tap()
-                elif autofarm_count > 0 and autofarm_current_money[0] == '+259,200':
+                elif autofarm_count > 0 and autofarm_current_money[0] == '+324,000':
                     autofarm_button = await page.locator('//*[@id="root"]/main/div/div/div[2]/div[2]/div/div[1]').tap()
                     time.sleep(2)
                     clime_money = await page.get_by_role("button", name="Активировать бота").tap()
@@ -114,7 +114,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 1)},
+    hour={i for i in range(0, 25, 3)},
     minute={13},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,

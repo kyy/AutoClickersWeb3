@@ -17,12 +17,12 @@ TAP_PAUSE = 1000
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     try:
-        await page.locator('//*[@id="root"]/div/div[1]/div/div[2]/div[2]/button').tap(force=True)  # claim
+        await page.get_by_text("Collect").tap()  # collect
     except:
-        await browser.close()
-    time.sleep(5)
+        pass
+    time.sleep(2)
     try:
-        await page.locator('//*[@id="root"]/div/div[1]/div/div[2]/div[2]/button').tap(force=True)  # claim  # claim
+        await page.get_by_text("Start farming").tap()  # start farming
     except:
         pass
     time.sleep(2)
@@ -73,7 +73,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 30, 8)},
+    hour={i for i in range(0, 25, 6)},
     minute={45},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,
