@@ -8,31 +8,22 @@ from fu import start_page_at_phone, create_proccess, multy_tap, get_canonic_full
 from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 
 NAME = __name__.split('.')[-1]
-TELEGRAM_URL = "https://web.telegram.org/k/#@kolo"
+TELEGRAM_URL = "https://web.telegram.org/k/#@TheBaboon_Bot"
 URL = os.getenv(f"{NAME.upper()}_URL")
-TAP_PAUSE = 500
 
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
 
+    energy = await page.locator('//*[@id="root"]/main/div/div[3]/button[2]/div/div').text_content()
+    energy = energy.split(".")[0]
     while True:
-        count = 0
-        for i in range(TAP_PAUSE):
-
-            await multy_tap(
-                page=page,
-                semaphore=2,
-                taps=2,
-                locator='//*[@id="app"]/div/div/div[2]/div/div[2]/div[2]/div/div/svg/g/g/g[7]/image',
-            )
-
-            count += 1
-
-            if count == TAP_PAUSE - 1:
-                time.sleep(1)
-                await browser.close()
-                return True
+        await multy_tap(
+            page=page,
+            semaphore=10,
+            taps=10,
+            locator='//*[@id="root"]/main/div/div[2]/button/div[2]/div',
+        )
 
 
 async def main():
@@ -70,11 +61,11 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 8)},
+    hour={i for i in range(0, 25, 1)},
     minute={22},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,
-    timeout=30 * 60,
+    timeout=50 * 60,
     unique=True,
     name=NAME,
     job_id=f'{NAME}_001',
