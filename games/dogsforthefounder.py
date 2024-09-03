@@ -24,8 +24,8 @@ async def run(playwright: Playwright):
 
         await multy_tap(
             page=page,
-            semaphore=5,
-            taps=5,
+            semaphore=2,
+            taps=2,
             locator='//*[@id="root"]/div/div[1]/div/div[6]/div/div[2]',
         )
 
