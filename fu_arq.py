@@ -29,7 +29,11 @@ async def refresh_all_url_job(ctx):
             try:
                 fu, name = fu_name
                 src: str = await fu(playwright)
-                await redis.enqueue_job(function='refresh_url', args=(src, name), _job_try=3)
+                await redis.enqueue_job(
+                    'refresh_url',
+                    src, name,
+                    # _job_try=3,
+                )
             except Exception as e:
                 print(name, e)
 
