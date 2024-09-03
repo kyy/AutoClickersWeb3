@@ -84,7 +84,7 @@ async def process(ctx=None):
     return create_proccess(target=game)
 
 
-async def refresh_game_url(playwright: Playwright, run=True):
+async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
     """
     :param playwright:
     :return: обновляем ссылки игр содержащих временный токен
@@ -98,6 +98,7 @@ async def refresh_game_url(playwright: Playwright, run=True):
         )
 
         await page.get_by_role("button", name="Играть").first.click()
+        time.sleep(2)
         await page.get_by_role("button", name="Launch").click()
 
         time.sleep(2)
