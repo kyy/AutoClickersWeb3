@@ -18,43 +18,15 @@ async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright, timeout=3)
 
     try:
-        await page.locator('//*[@id="root"]/div[3]/button').tap()  # X
+        await page.locator('//*[@id="root"]/div[1]/div/div/div[2]/div/div').tap()
     except:
         pass
-    time.sleep(1)
+    time.sleep(2)
 
     try:
-        await page.locator('//*[@id="root"]/div/div[2]/div/div[3]/button').tap()  # clime
+        await page.locator('//*[@id="root"]/div[1]/div/div/div[2]/div/div').tap()
     except:
         pass
-    time.sleep(3)
-    try:
-        await page.locator('//*[@id="root"]/div/div[2]/div/div[3]/button').tap()  # clime
-    except:
-        await browser.close()
-
-    await page.get_by_text("Play").tap()
-
-    while True:
-        count = 0
-        for i in range(TAP_PAUSE):
-            energy_current = await page.locator('//*[@id="root"]/div/div[2]/div[1]/div[6]/div[1]/div[2]').text_content()
-
-            await multy_tap(
-                page=page,
-                semaphore=3,
-                taps=3,
-                locator='//*[@id="root"]/div/div[2]/div[1]/div[5]/div/div[1]/div',
-            )
-
-            count += 1
-
-            if count == TAP_PAUSE - 1:
-                time.sleep(1)
-            if int(energy_current) < 10:
-                time.sleep(1)
-                await browser.close()
-                return True
 
 
 async def main(ctx=None):
@@ -92,9 +64,9 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 2)},
+    hour={i for i in range(0, 25, 9)},
     minute={45},
-    run_at_startup=CRON_RUN_AT_STARTUP_TAP,
+    run_at_startup=True,
     max_tries=3,
     timeout=10 * 60,
     unique=True,
