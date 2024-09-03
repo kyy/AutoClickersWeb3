@@ -10,7 +10,6 @@ from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 NAME = __name__.split('.')[-1]
 TELEGRAM_URL = "https://web.telegram.org/k/#@dogs_for_the_founder_bot"
 URL = os.getenv(f"{NAME.upper()}_URL")
-TAP_PAUSE = 1000
 
 
 async def run(playwright: Playwright):
@@ -19,27 +18,21 @@ async def run(playwright: Playwright):
     await page.get_by_role("button", name="Собрать").tap()
 
     while True:
-        count = 0
-        for i in range(TAP_PAUSE):
-            energy_current = await page.locator(
-                '//*[@id="root"]/div/div[1]/div/div[7]/div[1]/div/p[1]').text_content()
-            energy_current = energy_current.replace("/", "")
+        energy_current = await page.locator(
+            '//*[@id="root"]/div/div[1]/div/div[7]/div[1]/div/p[1]').text_content()
+        energy_current = energy_current.replace("/", "")
 
-            await multy_tap(
-                page=page,
-                semaphore=5,
-                taps=5,
-                locator='//*[@id="root"]/div/div[1]/div/div[6]/div/div[2]',
-            )
+        await multy_tap(
+            page=page,
+            semaphore=5,
+            taps=5,
+            locator='//*[@id="root"]/div/div[1]/div/div[6]/div/div[2]',
+        )
 
-            count += 1
-
-            if count == TAP_PAUSE - 1:
-                time.sleep(1)
-            if int(energy_current) < 10:
-                time.sleep(1)
-                await browser.close()
-                return True
+        if int(energy_current) < 10:
+            time.sleep(1)
+            await browser.close()
+            return True
 
 
 async def main():
