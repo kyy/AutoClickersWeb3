@@ -22,13 +22,17 @@ async def run(playwright: Playwright):
     except:
 
         await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap()  # clime
-    time.sleep(10)
-    try:
-        await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap()  # start mining
-    except:
-
-        await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap(timeout=5000)  # start mining
     time.sleep(2)
+    try:
+        await page.get_by_role("button", "Начать майнинг").tap()  # start mining
+    except:
+        pass
+    time.sleep(2)
+
+    await page.get_by_role("button", name="Пропустить").tap()
+
+    time.sleep(2)
+
     await browser.close()
 
 
