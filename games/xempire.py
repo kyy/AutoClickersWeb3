@@ -21,8 +21,12 @@ async def run(playwright: Playwright):
         await page.get_by_text('Получить').tap()  # clime
     except:
         await browser.close()
-
+    start_time = time.time()
+    duration = 30 * 60
     while True:
+        elapsed_time = time.time() - start_time
+        if elapsed_time > duration:
+            await browser.close()
         count = 0
         energy_current = 125
 

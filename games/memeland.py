@@ -27,6 +27,7 @@ async def run(playwright: Playwright):
         await page.locator('//*[@id="root"]/div[1]/div/div/div[2]/div/div').tap()
     except:
         pass
+    await browser.close()
 
 
 async def main(ctx=None):
@@ -66,7 +67,7 @@ cron_config: cron = dict(
     coroutine=process,
     hour={i for i in range(0, 25, 9)},
     minute={45},
-    run_at_startup=True,
+    run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,
     timeout=10 * 60,
     unique=True,

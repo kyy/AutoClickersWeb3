@@ -16,8 +16,13 @@ async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
 
     await page.get_by_role("button", name="Собрать").tap()
-
+    start_time = time.time()
+    duration = 30 * 60
     while True:
+        elapsed_time = time.time() - start_time
+        if elapsed_time > duration:
+            await browser.close()
+
         energy_current = await page.locator(
             '//*[@id="root"]/div/div[1]/div/div[7]/div[1]/div/p[1]').text_content()
         energy_current = energy_current.replace("/", "")

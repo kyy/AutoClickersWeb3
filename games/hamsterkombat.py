@@ -20,9 +20,15 @@ async def run(playwright: Playwright):
     try:
         await page.locator('//*[@id="__nuxt"]/div/div[3]/div[2]/div[2]/div/button').tap()  # clime
     except:
-        await browser.close()
+        pass
+
+    start_time = time.time()
+    duration = 5 * 60
 
     while True:
+        elapsed_time = time.time() - start_time
+        if elapsed_time > duration:
+            await browser.close()
         count = 0
         for i in range(TAP_PAUSE):
             energy_current = await page.locator('//*[@id="__nuxt"]/div/main/div[2]/div[3]/div[2]/div/p').text_content()

@@ -24,7 +24,15 @@ async def run(playwright: Playwright):
     except:
         pass
 
+    start_time = time.time()
+    duration = 5 * 60
+
     while True:
+
+        elapsed_time = time.time() - start_time
+        if elapsed_time > duration:
+            await browser.close()
+
         count = 0
         for i in range(TAP_PAUSE):
             energy_current = await page.locator(

@@ -23,6 +23,8 @@ async def run(playwright: Playwright):
     except:
         pass
 
+    await browser.close()
+
 
 async def main():
     try:

@@ -41,8 +41,8 @@ async def refresh_all_url_job(ctx):
 cron_j.append(
     cron(
         coroutine=refresh_all_url_job,
-        hour={1},
-        minute={1},
+        hour={23},
+        minute={55},
         run_at_startup=True,
         max_tries=3,
         timeout=30 * 60,

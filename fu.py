@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 from dotenv_config import l_dot_env
 from games.__const import HEADLESS
+
 l_dot_env()
 
 TELEGRAM_URL = "https://web.telegram.org/a/"
@@ -78,7 +79,7 @@ def get_fu_refresh_game_urls_name() -> list:
     funcs = [i.split(".")[0] for i in files if "__" not in i]
 
     games = []
-    for module_name in tqdm(funcs, desc='get_fu_refresh_game_urls_name'):
+    for module_name in funcs:
         if module_name != "":
             try:
                 module = __import__(name=PATH_TO_GAMES + "." + module_name, fromlist=["refresh_game_url", ])
@@ -99,7 +100,7 @@ def get_fu_process() -> list:
     files = os.listdir(PATH_TO_GAMES)
     funcs = [i.split(".")[0] for i in files if "__" not in i]
     games = []
-    for module_name in tqdm(funcs, desc='get_fu_process'):
+    for module_name in funcs:
         if module_name != "":
             try:
                 module = __import__(name=PATH_TO_GAMES + "." + module_name, fromlist=["cron_config", ])

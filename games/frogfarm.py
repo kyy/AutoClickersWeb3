@@ -22,6 +22,7 @@ async def run(playwright: Playwright):
         time.sleep(2)
     except:
         pass
+    await browser.close()
 
 
 async def main():

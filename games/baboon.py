@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+
 from arq import cron
 from playwright.async_api import async_playwright, Playwright, Error
 import asyncio
@@ -14,10 +15,14 @@ URL = os.getenv(f"{NAME.upper()}_URL")
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
-
+    start_time = time.time()
+    duration = 30 * 60
     energy = await page.locator('//*[@id="root"]/main/div/div[3]/button[2]/div/div').text_content()
     energy = energy.split(".")[0]
     while True:
+        elapsed_time = time.time() - start_time
+        if elapsed_time > duration:
+            await browser.close()
         await multy_tap(
             page=page,
             semaphore=10,
@@ -64,8 +69,8 @@ cron_config: cron = dict(
     hour={i for i in range(0, 25, 1)},
     minute={22},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
-    max_tries=3,
-    timeout=50 * 60,
+    max_tries=1,
+    timeout=30 * 60,
     unique=True,
     name=NAME,
     job_id=f'{NAME}_001',
