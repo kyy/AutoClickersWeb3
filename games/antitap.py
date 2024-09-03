@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+
 from arq import cron
 from playwright.async_api import async_playwright, Playwright, Error
 import asyncio
@@ -8,33 +9,37 @@ from fu import start_page_at_phone, create_proccess, multy_tap, get_canonic_full
 from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 
 NAME = __name__.split('.')[-1]
-TELEGRAM_URL = "https://web.telegram.org/k/#@Pumpad_Bot"
+TELEGRAM_URL = "https://web.telegram.org/k/#@ArtiTapBot"
 URL = os.getenv(f"{NAME.upper()}_URL")
-TAP_PAUSE = 500
 
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
 
-    await page.locator('//*[@id="qhVO3"]/div/label/input').tap()
+    await page.get_by_role("button", name="Claim").tap()
+    time.sleep(2)
+
+    for _ in range(4):
+        await page.locator('//*[@id="app"]/div/div[2]/div/div[2]/div/div[6]/div/button').tap()
+        time.sleep(1)
+
+    await page.get_by_role("button", name="Start").tap()
+
+    start_time = time.time()
+    duration = 30 * 60
+    energy = await page.locator('//*[@id="app"]/div/div[2]/div/div[2]/div[1]/div[1]/div[1]/div[1]').text_content()
+    energy = int(energy.split(" / ")[0].replace(" ", ""))
 
     while True:
-        count = 0
-        for i in range(TAP_PAUSE):
-
-            await multy_tap(
-                page=page,
-                semaphore=2,
-                taps=2,
-                locator='//*[@id="app"]/div/div/div[2]/div/div[2]/div[2]/div/div/svg/g/g/g[7]/image',
-            )
-
-            count += 1
-
-            if count == TAP_PAUSE - 1:
-                time.sleep(1)
-                await browser.close()
-                return True
+        elapsed_time = time.time() - start_time
+        if elapsed_time > duration or energy < 5:
+            await browser.close()
+        await multy_tap(
+            page=page,
+            semaphore=10,
+            taps=10,
+            locator='//*[@id="app"]/div/div[2]/div/div[2]/div[2]/img',
+        )
 
 
 async def main():
@@ -74,8 +79,8 @@ cron_config: cron = dict(
     coroutine=process,
     hour={i for i in range(0, 25, 8)},
     minute={22},
-    run_at_startup=False,
-    max_tries=3,
+    run_at_startup=True,
+    max_tries=1,
     timeout=30 * 60,
     unique=True,
     name=NAME,
