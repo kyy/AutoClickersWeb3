@@ -11,7 +11,7 @@ from telethon.sessions import StringSession
 from tqdm import tqdm
 
 from dotenv_config import l_dot_env
-
+from games.__const import HEADLESS
 l_dot_env()
 
 TELEGRAM_URL = "https://web.telegram.org/a/"
@@ -28,7 +28,7 @@ async def start_page_at_phone(playwright: Playwright, url: str, browser_context:
         context = playwright.devices['Pixel 7']
     if browser_context:
         context.update(**browser_context)
-    browser = await playwright.chromium.launch(headless=True)
+    browser = await playwright.chromium.launch(headless=HEADLESS)
     browser_mobile = await browser.new_context(**context)
     page = await browser_mobile.new_page()
     await page.goto(url)
@@ -85,11 +85,10 @@ def get_fu_refresh_game_urls_name() -> list:
                 fu = module.__dict__.get("refresh_game_url")
                 if fu is not None and fu is not False:
                     games.append((fu, module_name))
-                    print(f" импортирован <refresh_game_url> {module_name=}")
                 elif fu is None:
-                    print(f"<get_fu_refresh_game_urls_name> не удалось импортировать {module_name=} [{fu}]")
+                    pass
             except ImportError as e:
-                print(f"<get_fu_refresh_game_urls_name> не удалось импортировать {module_name=} [{e}]")
+                pass
     return games
 
 
@@ -129,11 +128,14 @@ async def get_canonic_full_game_url(page, browser):
     :param playwright:
     :return: обновляем ссылки игр содержащих временный токен
     """
-
+    time.sleep(4)
     await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
     await page.locator('//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]').click()  # burger
+    time.sleep(2)
     await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # launch
+    time.sleep(2)
     iframe = await page.wait_for_selector('iframe')
+    time.sleep(1)
     src = await iframe.get_attribute('src')
     await browser.close()
     return src

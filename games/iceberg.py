@@ -5,7 +5,7 @@ import time
 from arq import cron
 from playwright.async_api import async_playwright, Playwright, Error
 import asyncio
-from fu import start_page_at_phone, create_proccess
+from fu import start_page_at_phone, create_proccess, get_canonic_full_game_url
 from games.__const import CRON_RUN_AT_STARTUP_URL, CRON_RUN_AT_STARTUP_TAP
 
 NAME = __name__.split('.')[-1]
@@ -58,15 +58,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
             browser_context={"storage_state": "web_telegram.json"},
         )
 
-        await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
-
-        await page.locator('//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]').click()  # burger
-
-        await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # launch
-        iframe = await page.wait_for_selector('iframe')
-        src = await iframe.get_attribute('src')
-        await browser.close()
-        return src
+        return await get_canonic_full_game_url(page, browser)
     elif run is False:
         return False
 

@@ -15,6 +15,10 @@ TAP_PAUSE = 500
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
+    try:
+        await page.get_by_role("button", name="clime").tap()
+    except:
+        pass
 
     while True:
         count = 0

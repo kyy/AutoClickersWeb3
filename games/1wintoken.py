@@ -84,7 +84,7 @@ async def process(ctx=None):
     return create_proccess(target=game)
 
 
-async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
+async def refresh_game_url(playwright: Playwright, run=True):
     """
     :param playwright:
     :return: обновляем ссылки игр содержащих временный токен
@@ -97,18 +97,8 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
             browser_context={"storage_state": "web_telegram.json"},
         )
 
-        await page.wait_for_selector(
-            'xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
-        await page.locator(
-            'xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]').click()  # burger
-        await page.locator(
-            'xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[1]/div/div[2]/div/div[3]').click()  # start
-        time.sleep(2)
-        await page.locator(
-            'xpath=//*[@class="bubbles-group bubbles-group-last"]/div/div/div[2]/div[1]/button/div').click()  # run
-        time.sleep(2)
-        await page.locator(
-            'xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # accept run
+        await page.get_by_role("button", name="Играть").first.click()
+        await page.get_by_role("button", name="Launch").click()
 
         time.sleep(2)
 
