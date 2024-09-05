@@ -18,10 +18,10 @@ async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright, timeout=2)
 
     try:
-        await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap()  # clime
+        await page.get_by_role("button", "Забрать").tap()  # clime
     except:
+        pass
 
-        await page.locator('//*[@id="app"]/div/div/div/div/div[1]/button').tap()  # clime
     time.sleep(2)
     try:
         await page.get_by_role("button", "Начать майнинг").tap()  # start mining

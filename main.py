@@ -7,7 +7,6 @@ from fu_arq import refresh_url, REDIS_SETTINGS, cron_j
 
 class Work(Worker):
     redis_settings = REDIS_SETTINGS
-    max_jobs = 1
     functions = [refresh_url]
     cron_jobs = cron_j
 

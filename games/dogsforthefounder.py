@@ -14,8 +14,10 @@ URL = os.getenv(f"{NAME.upper()}_URL")
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
-
-    await page.get_by_role("button", name="Собрать").tap()
+    try:
+        await page.get_by_role("button", name="Собрать").tap()
+    except:
+        pass
     start_time = time.time()
     duration = 30 * 60
     while True:

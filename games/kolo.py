@@ -20,8 +20,13 @@ async def run(playwright: Playwright):
     except:
         pass
 
+    try:
+        await page.get_by_role("button", name="skip").tap()
+    except:
+        pass
+
     start_time = time.time()
-    duration = 30 * 60
+    duration = 5 * 60
 
     while True:
         elapsed_time = time.time() - start_time
