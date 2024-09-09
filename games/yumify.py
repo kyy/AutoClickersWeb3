@@ -4,7 +4,7 @@ import time
 from arq import cron
 from playwright.async_api import async_playwright, Playwright, Error
 import asyncio
-from fu import start_page_at_phone, create_proccess, multy_tap, get_canonic_full_game_url
+from fu import start_page_at_phone, create_proccess
 from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 
 NAME = __name__.split('.')[-1]
