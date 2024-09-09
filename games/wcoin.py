@@ -8,48 +8,28 @@ from fu import start_page_at_phone, create_proccess, multy_tap, get_canonic_full
 from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 
 NAME = __name__.split('.')[-1]
-TELEGRAM_URL = "https://web.telegram.org/k/#@gemzcoin_bot"
+TELEGRAM_URL = "https://web.telegram.org/k/#@wcoin_tapbot"
 URL = os.getenv(f"{NAME.upper()}_URL")
 TAP_PAUSE = 1000
 
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
-    await page.wait_for_selector('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]')
-    try:
-        await page.locator('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]/div').tap()
-    except:
-        pass
-
-    try:
-        await page.locator('//*[@id="root"]/div/div/div[1]/div/div/div/img').tap()
-    except:
-        pass
-
-    try:
-        await page.locator('xpath=//*[@id="root"]/div/div/div[1]/div/div/div/img').tap()  # закрыть окно с приглашением
-    except:
-        pass
-
     start_time = time.time()
-    duration = 5 * 60
-
+    duration = 30 * 60
     while True:
-
         elapsed_time = time.time() - start_time
         if elapsed_time > duration:
             await browser.close()
-
         count = 0
         for i in range(TAP_PAUSE):
             energy_current = await page.locator(
-                'xpath=//*[@id="root"]/div/div/div[2]/footer/div[1]/div[1]/div[1]/div[2]/span[1]').text_content()
-
+                '//*[@id="root"]/div[1]/div/div[2]/div/div[2]/div[1]/div[2]/div/h1[1]').text_content()
             await multy_tap(
                 page=page,
                 semaphore=10,
                 taps=10,
-                locator='//*[@id="coin"]/div[1]',
+                locator='//*[@id="root"]/div[1]/div/div[2]/div/div[2]/div[1]/button/div',
             )
 
             count += 1
@@ -90,7 +70,17 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
             playwright=playwright,
             browser_context={"storage_state": "web_telegram.json"},
         )
-        return await get_canonic_full_game_url(page, browser)
+
+        await page.get_by_role("button").filter(has_text="Play").last.click()
+        time.sleep(2)
+        await page.get_by_role("button", name="Launch").click()
+
+        time.sleep(2)
+
+        iframe = await page.wait_for_selector('iframe')
+        src = await iframe.get_attribute('src')
+        await browser.close()
+        return src
     elif run is False:
         return False
 
@@ -98,7 +88,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 cron_config: cron = dict(
     coroutine=process,
     hour={i for i in range(0, 25, 1)},
-    minute={5},
+    minute={29},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,
     timeout=30 * 60,
