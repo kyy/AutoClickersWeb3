@@ -17,13 +17,17 @@ async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     await page.wait_for_selector('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]')
     try:
-        await page.locator('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]/div').tap(force=True)
+        await page.locator('//*[@id="root"]/div/div/div[1]/div/div/div/div/div[2]/div').tap()
     except:
         pass
 
     try:
-        await page.locator('xpath=//*[@id="root"]/div/div/div[1]/div/div/div/img').tap(
-            force=True)  # закрыть окно с приглашением
+        await page.locator('//*[@id="root"]/div/div/div[1]/div/div/div/img').tap()
+    except:
+        pass
+
+    try:
+        await page.locator('xpath=//*[@id="root"]/div/div/div[1]/div/div/div/img').tap()  # закрыть окно с приглашением
     except:
         pass
 

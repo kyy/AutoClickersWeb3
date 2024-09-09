@@ -17,29 +17,9 @@ async def run(playwright: Playwright):
     try:
         await page.get_by_role("button", name="Собрать").tap()
     except:
-        pass
-    start_time = time.time()
-    duration = 30 * 60
-    while True:
-        elapsed_time = time.time() - start_time
-        if elapsed_time > duration:
-            await browser.close()
+        await browser.close()
 
-        energy_current = await page.locator(
-            '//*[@id="root"]/div/div[1]/div/div[7]/div[1]/div/p[1]').text_content()
-        energy_current = energy_current.replace("/", "")
-
-        await multy_tap(
-            page=page,
-            semaphore=2,
-            taps=2,
-            locator='//*[@id="root"]/div/div[1]/div/div[6]/div/div[2]',
-        )
-
-        if int(energy_current) < 10:
-            time.sleep(1)
-            await browser.close()
-            return True
+    await browser.close()
 
 
 async def main():

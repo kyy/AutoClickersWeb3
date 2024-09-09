@@ -18,13 +18,13 @@ async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright, timeout=2)
 
     try:
-        await page.get_by_role("button", "Забрать").tap()  # clime
+        await page.get_by_role("button").filter(has_text="Забрать").tap()  # clime
     except:
         pass
 
     time.sleep(2)
     try:
-        await page.get_by_role("button", "Начать майнинг").tap()  # start mining
+        await page.get_by_role("button").filter(has_text="Начать майнинг").tap()  # start mining
     except:
         pass
     time.sleep(2)
@@ -71,7 +71,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 4)},
+    hour={i for i in range(0, 25, 2)},
     minute={00},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,

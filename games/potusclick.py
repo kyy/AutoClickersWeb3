@@ -24,14 +24,14 @@ async def run(playwright: Playwright):
             await browser.close()
         count = 0
         for i in range(TAP_PAUSE):
-            energy_current = await page.locator('//*[@id="app"]/div[1]/main/section/div[2]/div[3]/span').text_content()
+            energy_current = await page.locator('//*[@id="app"]/div[1]/main/section/div[3]/div[3]/span').text_content()
             energy_current = energy_current.split("/")[0]
 
             await multy_tap(
                 page=page,
                 semaphore=3,
                 taps=3,
-                locator='//*[@id="app"]/div[1]/main/section/div[2]/button/picture/img',
+                locator='//*[@id="app"]/div[1]/main/section/div[3]/button/div[1]',
             )
 
             count += 1
@@ -79,7 +79,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 8)},
+    hour={i for i in range(0, 25, 2)},
     minute={39},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,

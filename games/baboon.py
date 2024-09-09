@@ -15,6 +15,11 @@ URL = os.getenv(f"{NAME.upper()}_URL")
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
+
+    try:
+        await page.get_by_role("button").filter(has_text="получить")
+    except:
+        pass
     start_time = time.time()
     duration = 30 * 60
     energy = await page.locator('//*[@id="root"]/main/div/div[3]/button[2]/div/div').text_content()

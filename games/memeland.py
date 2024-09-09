@@ -65,7 +65,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 9)},
+    hour={i for i in range(0, 25, 2)},
     minute={45},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     max_tries=3,

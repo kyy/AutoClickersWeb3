@@ -16,7 +16,7 @@ TAP_PAUSE = 500
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     try:
-        await page.get_by_role("button", name="clime").tap()
+        await page.get_by_role("button").filter(has_text="claim").tap()
     except:
         pass
 
@@ -24,31 +24,46 @@ async def run(playwright: Playwright):
         await page.get_by_role("button", name="skip").tap()
     except:
         pass
+    try:
+        for _ in range(7):
+            await page.get_by_role("button").filter(has_text="yes").tap()
+            time.sleep(2)
+
+    except:
+        pass
+    finally:
+        await page.get_by_role("button").filter(has_text="claim").tap()
 
     start_time = time.time()
     duration = 5 * 60
 
-    while True:
-        elapsed_time = time.time() - start_time
-        if elapsed_time > duration:
-            await browser.close()
+    try:
+        timer = await page.locator('//*[@id="app"]/div/div/div[2]/div/div[3]/span').text_content()
+    except:
+        timer = None
 
-        count = 0
-        for i in range(TAP_PAUSE):
-
-            await multy_tap(
-                page=page,
-                semaphore=2,
-                taps=2,
-                locator='//*[@id="app"]/div/div/div[2]/div/div[2]/div[2]/div/div/svg/g/g/g[7]/image',
-            )
-
-            count += 1
-
-            if count == TAP_PAUSE - 1:
-                time.sleep(1)
+    if timer is not None:
+        while True:
+            elapsed_time = time.time() - start_time
+            if elapsed_time > duration:
                 await browser.close()
-                return True
+
+            count = 0
+            for i in range(TAP_PAUSE):
+
+                await multy_tap(
+                    page=page,
+                    semaphore=2,
+                    taps=2,
+                    locator='//*[@id="app"]/div/div/div[2]/div/div[2]/div[2]/div[1]',
+                )
+
+                count += 1
+
+                if count == TAP_PAUSE - 1:
+                    time.sleep(1)
+                    await browser.close()
+                    return True
 
 
 async def main():
