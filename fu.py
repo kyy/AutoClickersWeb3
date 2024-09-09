@@ -113,12 +113,15 @@ def get_fu_process() -> list:
     return games
 
 
-async def multy_tap(page: async_playwright, taps: int, locator: str, semaphore: int = 20):
+async def multy_tap(page: async_playwright, taps: int, locator: str, semaphore: int = 20, tap: bool = True):
     semaphore = asyncio.Semaphore(semaphore)
 
     async def one_tap():
         async with semaphore:
-            await page.locator(locator).tap(force=True)
+            if tap:
+                await page.locator(locator).tap(force=True)
+            else:
+                await page.locator(locator).click(force=True)
 
     task_tap = [asyncio.ensure_future(one_tap()) for tap in range(taps)]
     await asyncio.gather(*task_tap)

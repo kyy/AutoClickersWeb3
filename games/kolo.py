@@ -36,13 +36,13 @@ async def run(playwright: Playwright):
 
     start_time = time.time()
     duration = 5 * 60
-
+    timer_loc = await page.locator('//*[@id="app"]/div/div/div[2]/div/div[3]/span')
     try:
-        timer = await page.locator('//*[@id="app"]/div/div/div[2]/div/div[3]/span').text_content()
+        timer_loc.text_content()
     except:
-        timer = None
+        timer_loc = False
 
-    if timer is not None:
+    if timer_loc.is_visible():
         while True:
             elapsed_time = time.time() - start_time
             if elapsed_time > duration:
