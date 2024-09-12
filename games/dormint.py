@@ -17,12 +17,17 @@ TAP_PAUSE = 1000
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     try:
-        await page.locator('//*[@id="root"]/div/div/div/div[2]/div/div/button').tap(force=True)  # claim
+        await page.get_by_role("button", name="Continue").tap()
     except:
-        await browser.close()
+        pass
+
+    try:
+        await page.get_by_role("button").filter(has_text="Claim").tap()
+    except:
+        pass
     time.sleep(8)
     try:
-        await page.get_by_text('Start sleeping').tap()  # claim
+        await page.get_by_text('Start sleeping').tap()
     except:
         pass
     time.sleep(2)
@@ -67,9 +72,8 @@ cron_config: cron = dict(
     coroutine=process,
     hour={i for i in range(0, 25, 1)},
     minute={32},
-    run_at_startup=CRON_RUN_AT_STARTUP_TAP,
-    max_tries=3,
-    timeout=30 * 60,
+    run_at_startup=False,
+    timeout=2 * 60,
     unique=True,
     name=NAME,
     job_id=f'{NAME}_001',

@@ -116,7 +116,6 @@ cron_config: cron = dict(
     hour={i for i in range(0, 25, 4)},
     minute={10},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
-    max_tries=3,
     timeout=30 * 60,
     unique=True,
     name=NAME,

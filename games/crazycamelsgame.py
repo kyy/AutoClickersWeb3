@@ -17,11 +17,11 @@ async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     time.sleep(5)
     try:
-        await page.locator('//*[@id="canvas"]').tap()
-        time.sleep(5)
+        for _ in range(3):
+            await page.locator('//*[@id="canvas"]').tap()
+            time.sleep(5)
     except:
         pass
-
     await browser.close()
 
 
@@ -69,10 +69,9 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 1)},
-    minute={38},
+    hour={i for i in range(0, 25, 2)},
+    minute={16},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
-    max_tries=3,
     timeout=2 * 60,
     unique=True,
     name=NAME,

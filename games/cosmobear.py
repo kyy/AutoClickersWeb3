@@ -19,8 +19,8 @@ async def run(playwright: Playwright):
 
     try:
         await page.get_by_role("button").filter(has_text="Claim").tap()
-        time.sleep(1)
-        await page.get_by_role("button", name="Skip for now").tap()
+        time.sleep(2)
+        await page.get_by_role("button").filter(has_text="Skip").tap()
     except:
         pass
 
@@ -96,8 +96,7 @@ cron_config: cron = dict(
     hour={i for i in range(0, 29, 1)},
     minute={39},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
-    max_tries=3,
-    timeout=5 * 60,
+    timeout=10 * 60,
     unique=True,
     name=NAME,
     job_id=f'{NAME}_001',

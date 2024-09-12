@@ -24,46 +24,31 @@ async def run(playwright: Playwright):
         await page.get_by_role("button", name="skip").tap()
     except:
         pass
-    try:
-        for _ in range(7):
-            await page.get_by_role("button").filter(has_text="yes").tap()
-            time.sleep(2)
-
-    except:
-        pass
-    finally:
-        await page.get_by_role("button").filter(has_text="claim").tap()
 
     start_time = time.time()
     duration = 5 * 60
-    timer_loc = await page.locator('//*[@id="app"]/div/div/div[2]/div/div[3]/span')
-    try:
-        timer_loc.text_content()
-    except:
-        timer_loc = False
 
-    if timer_loc.is_visible():
-        while True:
-            elapsed_time = time.time() - start_time
-            if elapsed_time > duration:
+    while True:
+        elapsed_time = time.time() - start_time
+        if elapsed_time > duration:
+            await browser.close()
+
+        count = 0
+        for i in range(TAP_PAUSE):
+
+            await multy_tap(
+                page=page,
+                semaphore=2,
+                taps=2,
+                locator='//*[@id="app"]/div/div/div[2]/div/div[2]/div[2]/div[1]',
+            )
+
+            count += 1
+
+            if count == TAP_PAUSE - 1:
+                time.sleep(1)
                 await browser.close()
-
-            count = 0
-            for i in range(TAP_PAUSE):
-
-                await multy_tap(
-                    page=page,
-                    semaphore=2,
-                    taps=2,
-                    locator='//*[@id="app"]/div/div/div[2]/div/div[2]/div[2]/div[1]',
-                )
-
-                count += 1
-
-                if count == TAP_PAUSE - 1:
-                    time.sleep(1)
-                    await browser.close()
-                    return True
+                return True
 
 
 async def main():
@@ -101,11 +86,10 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 8)},
+    hour={i for i in range(0, 25, 2)},
     minute={22},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
-    max_tries=3,
-    timeout=30 * 60,
+    timeout=10 * 60,
     unique=True,
     name=NAME,
     job_id=f'{NAME}_001',

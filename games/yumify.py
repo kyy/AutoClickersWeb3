@@ -35,6 +35,11 @@ async def run(playwright: Playwright):
     except:
         pass
 
+    try:
+        await iframe.get_by_role("button", name="Collect").click()
+    except:
+        pass
+
     while True:
         elapsed_time = time.time() - start_time
         if elapsed_time > duration:
@@ -42,11 +47,9 @@ async def run(playwright: Playwright):
 
         energy_current = await iframe.locator('//*[@class="h3-digit text-primary"]').last.text_content()
 
-        await iframe.locator('app-clicker-coin').click()
+        await iframe.locator('app-clicker-coin').first.click()
 
-        print(energy_current)
-
-        if int(energy_current) < 10:
+        if int(energy_current) < 100:
             time.sleep(1)
             await browser.close()
             return True
@@ -97,11 +100,10 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 1)},
+    hour={i for i in range(1, 25, 2)},
     minute={44},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
-    max_tries=3,
-    timeout=30 * 60,
+    timeout=5 * 60,
     unique=True,
     name=NAME,
     job_id=f'{NAME}_001',

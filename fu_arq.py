@@ -45,7 +45,7 @@ cron_j.append(
         minute={55},
         run_at_startup=True,
         max_tries=3,
-        timeout=30 * 60,
+        timeout=60 * 60,
         unique=True,
         name='refresh_urls',
         job_id=f'rfrsh_urls_001',

@@ -6,52 +6,45 @@ from arq import cron
 from playwright.async_api import async_playwright, Playwright, Error
 import asyncio
 from fu import start_page_at_phone, create_proccess, multy_tap, get_canonic_full_game_url
-from games.__const import CRON_RUN_AT_STARTUP_URL, CRON_RUN_AT_STARTUP_TAP
+from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 
 NAME = __name__.split('.')[-1]
-TELEGRAM_URL = "https://web.telegram.org/k/#@else_app_bot"
+TELEGRAM_URL = "https://web.telegram.org/k/#@Doginhood_bot"
 URL = os.getenv(f"{NAME.upper()}_URL")
-TAP_PAUSE = 1000
 
 
 async def run(playwright: Playwright):
-    browser, page = await start_page_at_phone(url=URL, playwright=playwright, timeout=3)
-
+    browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     try:
-        await page.get_by_role("button", name="Close").tap()
+        await page.get_by_role("button").filter(has_text="tap").tap()
     except:
         pass
 
     start_time = time.time()
-    duration = 20 * 60
+    duration = 10 * 60
 
     while True:
-        elapsed_time = time.time() - start_time
-        if elapsed_time > duration:
-            await browser.close()
-        count = 0
-        for i in range(TAP_PAUSE):
-            energy_current = await page.locator('//*[@id="root"]/div/div[2]/div[1]/div/div[4]/div[1]').text_content()
-            energy_current = energy_current.split("/")[0]
 
+        elapsed_time = time.time() - start_time
+        energy = await page.locator('//*[@id="tabs-navigation"]/div[1]/p').text_content()
+        energy = int(energy.split("/")[0])
+        if (elapsed_time > duration) or (energy < 10):
+            await browser.close()
+        try:
             await multy_tap(
                 page=page,
-                semaphore=3,
-                taps=3,
-                locator='//*[@id="root"]/div/div[2]/div[1]/div/div[3]/button/div/div',
+                semaphore=10,
+                taps=10,
+                locator='//*[@id="game_wrapper"]/button',
             )
-
-            count += 1
-
-            if count == TAP_PAUSE - 1:
-                time.sleep(1)
-            if int(energy_current) < 15:
-                time.sleep(1)
-                await browser.close()
-                return True
+        except:
+            try:
+                await page.locator('//*[@id="game_wrapper"]/div[1]/button').tap()
+            except:
+                await page.reload()
 
 
-async def main(ctx=None):
+async def main():
     try:
         async with async_playwright() as playwright:
             await run(playwright)
@@ -86,10 +79,9 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 1)},
-    minute={55},
+    hour={i for i in range(0, 25, 2)},
+    minute={2},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
-    max_tries=3,
     timeout=5 * 60,
     unique=True,
     name=NAME,
