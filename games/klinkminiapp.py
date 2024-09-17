@@ -9,46 +9,33 @@ from fu import start_page_at_phone, create_proccess, multy_tap, get_canonic_full
 from games.__const import CRON_RUN_AT_STARTUP_URL, CRON_RUN_AT_STARTUP_TAP
 
 NAME = __name__.split('.')[-1]
-TELEGRAM_URL = "https://web.telegram.org/k/#@CosmoBear_bot"
+TELEGRAM_URL = "https://web.telegram.org/k/#@KlinkFinanceBot"
 URL = os.getenv(f"{NAME.upper()}_URL")
 
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright, timeout=3)
 
-    try:
-        await page.get_by_role("button").filter(has_text="Claim").tap()
-        time.sleep(2)
-        await page.get_by_role("button").filter(has_text="Skip").tap()
-    except:
-        pass
-
-    try:
-        await page.get_by_role("button").filter(has_text="Claim").tap()
-    except:
-        pass
-
     start_time = time.time()
-    duration = 10 * 60
-
+    duration = 4 * 60
     while True:
         elapsed_time = time.time() - start_time
         if elapsed_time > duration:
             await browser.close()
-            energy_current = await page.locator('//*[@id="root"]/div/div[2]/div[6]/div[1]/div[2]/div/p').text_content()
-            energy_current = energy_current.split(" / ")[0].replace(",", "")
+        energy_current = await page.locator('//*[@id="root"]/div/div[2]/div[3]/div[1]/div/span[1]').text_content()
+        energy_current = energy_current.replace(",", "")
 
-            await multy_tap(
-                page=page,
-                semaphore=8,
-                taps=8,
-                locator='//*[@id="bear"]/div/div/div/div[2]',
-            )
+        await multy_tap(
+            page=page,
+            semaphore=5,
+            taps=5,
+            locator='//*[@id="root"]/div/div[2]/div[2]',
+        )
 
-            if int(energy_current) < 15:
-                time.sleep(1)
-                await browser.close()
-                return True
+        if int(energy_current) < 15:
+            time.sleep(1)
+            await browser.close()
+            return True
 
 
 async def main(ctx=None):
@@ -86,8 +73,8 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 29, 1)},
-    minute={39},
+    hour={i for i in range(0, 25, 1)},
+    minute={47},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     timeout=10 * 60,
     unique=True,
