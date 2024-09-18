@@ -10,11 +10,11 @@ from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 NAME = __name__.split('.')[-1]
 TELEGRAM_URL = "https://web.telegram.org/k/#@kolo"
 URL = os.getenv(f"{NAME.upper()}_URL")
-TAP_PAUSE = 500
 
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
+
     try:
         await page.get_by_role("button").filter(has_text="claim").tap()
     except:
@@ -26,29 +26,22 @@ async def run(playwright: Playwright):
         pass
 
     start_time = time.time()
-    duration = 5 * 60
+    duration = 4 * 60
 
-    while True:
-        elapsed_time = time.time() - start_time
+    elapsed_time = time.time() - start_time
+
+    for i in range(100):
         if elapsed_time > duration:
             await browser.close()
 
-        count = 0
-        for i in range(TAP_PAUSE):
+        await multy_tap(
+            page=page,
+            semaphore=2,
+            taps=2,
+            locator='g:nth-child(7) > image',
+        )
 
-            await multy_tap(
-                page=page,
-                semaphore=2,
-                taps=2,
-                locator='//*[@id="app"]/div/div/div[2]/div/div[2]/div[2]/div[1]',
-            )
-
-            count += 1
-
-            if count == TAP_PAUSE - 1:
-                time.sleep(1)
-                await browser.close()
-                return True
+    await browser.close()
 
 
 async def main():
@@ -87,9 +80,9 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 cron_config: cron = dict(
     coroutine=process,
     hour={i for i in range(0, 25, 2)},
-    minute={22},
+    minute={26},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
-    timeout=10 * 60,
+    timeout=4 * 60,
     unique=True,
     name=NAME,
     job_id=f'{NAME}_001',

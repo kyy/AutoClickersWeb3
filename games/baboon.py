@@ -15,11 +15,18 @@ URL = os.getenv(f"{NAME.upper()}_URL")
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
-
     try:
-        await page.get_by_role("button").filter(has_text="получить")
+        await page.get_by_role("button").filter(has_text="получить").tap()
     except:
         pass
+
+    try:
+        await page.get_by_role("link", name="Приз").tap()
+        time.sleep(1)
+        await page.get_by_role("button").filter(has_text="получить").tap()
+    except:
+        pass
+
     start_time = time.time()
     duration = 30 * 60
     energy = await page.locator('//*[@id="root"]/main/div/div[3]/button[2]/div/div').text_content()
@@ -72,7 +79,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 cron_config: cron = dict(
     coroutine=process,
     hour={i for i in range(0, 25, 2)},
-    minute={22},
+    minute={23},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     timeout=10 * 60,
     unique=True,

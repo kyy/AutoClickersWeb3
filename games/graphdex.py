@@ -25,6 +25,8 @@ async def run(playwright: Playwright):
     except:
         pass
 
+    await page.pause()
+
 
 async def main():
     try:
@@ -69,7 +71,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 4)},
+    hour={i for i in range(0, 25, 1)},
     minute={10},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     timeout=10 * 60,

@@ -16,6 +16,7 @@ TAP_PAUSE = 1000
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
+
     try:
         await page.get_by_role("button", name="Recieve").tap()  # claim
         time.sleep(2)
@@ -24,6 +25,13 @@ async def run(playwright: Playwright):
         await page.get_by_role("button").filter(has_text="Activate").tap()  # claim
     except:
         pass
+    try:
+        await page.locator("a:nth-child(4)").tap()
+        time.sleep(1)
+        await page.get_by_role("button").filter(has_text="claim").tap()
+    except:
+        pass
+
     await browser.close()
 
 
