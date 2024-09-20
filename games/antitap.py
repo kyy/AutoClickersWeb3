@@ -28,13 +28,13 @@ async def run(playwright: Playwright):
     await page.get_by_role("button", name="Start").tap()
 
     start_time = time.time()
-    duration = 2 * 60
-    energy = await page.locator('//*[@id="app"]/div/div[2]/div/div[2]/div[1]/div[1]/div[1]/div[1]').text_content()
-    energy = int(energy.split(" / ")[0].replace(" ", ""))
-    while True:
+    duration = 3 * 60
 
+    while True:
+        energy = await page.locator('//*[@id="app"]/div/div[2]/div/div[2]/div[1]/div[1]/div[1]/div[1]').text_content()
+        energy = int(energy.split(" / ")[0].replace(" ", ""))
         elapsed_time = time.time() - start_time
-        if elapsed_time > duration:
+        if any([elapsed_time > duration, energy < 50]):
             await browser.close()
         await multy_tap(
             page=page,
@@ -81,7 +81,7 @@ cron_config: cron = dict(
     coroutine=process,
     hour={i for i in range(0, 25, 2)},
     minute={50},
-    run_at_startup=CRON_RUN_AT_STARTUP_TAP,
+    run_at_startup=True,
     timeout=5 * 60,
     unique=True,
     name=NAME,
@@ -89,9 +89,4 @@ cron_config: cron = dict(
 )
 
 if __name__ == '__main__':
-    async def main():
-        async with async_playwright() as playwright:
-            await refresh_game_url(playwright)
-
-
-    asyncio.run(main())
+    pass
