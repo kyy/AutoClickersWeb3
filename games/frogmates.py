@@ -10,37 +10,61 @@ from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 NAME = __name__.split('.')[-1]
 TELEGRAM_URL = "https://web.telegram.org/k/#@Frogmates_bot"
 URL = os.getenv(f"{NAME.upper()}_URL")
-TAP_PAUSE = 1000
 
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
+
     start_time = time.time()
-    duration = 30 * 60
+    duration = 10 * 60
+
+    try:
+        await page.get_by_role("link", name="Rewards").tap()
+        await page.get_by_role("button", name="Claim Now").tap()
+    except:
+        pass
+
+    await page.get_by_role("link", name="Boost").tap()
+    try:
+        turbo_count = await page.locator(
+            '//*[@id="swagger-ui"]/div[2]/div[2]/div[1]/div/div[1]/div[2]/span[2]').text_content()
+        turbo_count = int(turbo_count.split("/")[0])
+    except:
+        turbo_count = 0
+
+    await page.get_by_role("link", name="Play").tap()
+
     while True:
         elapsed_time = time.time() - start_time
+
+        if turbo_count > 1:
+            try:
+                await page.get_by_role("link", name="Boost").tap()
+                await page.locator('//*[@id="swagger-ui"]/div[2]/div[2]/div[1]/div/div[1]/div[2]/span[2]').tap()
+                time.sleep(1)
+                await page.get_by_role("button", name="Get").tap()
+            except:
+                pass
+            finally:
+                turbo_count -= 1
+
         if elapsed_time > duration:
             await browser.close()
-        count = 0
-        for i in range(TAP_PAUSE):
-            energy_current = await page.locator(
-                '//*[@id="swagger-ui"]/div[4]/div[1]/div[2]/div/div/div[2]/div/div/span[1]').text_content()
-            energy_current = energy_current.split(" ")[-1]
-            await multy_tap(
-                page=page,
-                semaphore=5,
-                taps=5,
-                locator='//*[@id="swagger-ui"]/div[4]/div[1]/div[2]/div/div/div[1]/div[2]/img',
-            )
 
-            count += 1
+        await page.get_by_role("link", name="Play").tap()
+        energy_current = await page.locator(
+            '//*[@id="swagger-ui"]/div[4]/div[1]/div[2]/div/div/div[2]/div/div/span[1]').text_content()
+        energy_current = int(energy_current.split(" ")[-1])
 
-            if count == TAP_PAUSE - 1:
-                time.sleep(1)
-            if int(energy_current) < 10:
-                time.sleep(1)
-                await browser.close()
-                return True
+        await multy_tap(
+            page=page,
+            semaphore=5,
+            taps=5,
+            locator='//*[@id="swagger-ui"]/div[4]/div[1]/div[2]/div/div/div[1]/div[2]/img',
+        )
+        if all([energy_current < 50, turbo_count == 0]):
+            time.sleep(1)
+            await browser.close()
 
 
 async def main():
