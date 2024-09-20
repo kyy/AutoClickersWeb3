@@ -10,11 +10,10 @@ from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 NAME = __name__.split('.')[-1]
 TELEGRAM_URL = "https://web.telegram.org/k/#@bunnyAppBot"
 URL = os.getenv(f"{NAME.upper()}_URL")
-TAP_PAUSE = 1000
 
 
 async def run(playwright: Playwright):
-    browser, page = await start_page_at_phone(url=URL, playwright=playwright)
+    browser, page = await start_page_at_phone(url=URL, playwright=playwright, timeout=10)
 
     try:
         await page.get_by_role("button", name="Начать играть").tap()
@@ -22,31 +21,24 @@ async def run(playwright: Playwright):
         pass
 
     start_time = time.time()
-    duration = 30 * 60
+    duration = 10 * 60
     while True:
         elapsed_time = time.time() - start_time
-        if elapsed_time > duration:
+
+        energy_current = await page.locator(
+            '//*[@id="__nuxt"]/div/main/div/div[5]/div[1]/span').text_content()
+        energy_current = int(energy_current.replace(" ", ""))
+        await multy_tap(
+            page=page,
+            semaphore=5,
+            taps=5,
+            locator='//*[@id="__nuxt"]/div/main/div/div[3]',
+        )
+
+        if any([energy_current < 2, elapsed_time > duration]):
+            time.sleep(1)
             await browser.close()
-        count = 0
-        for i in range(TAP_PAUSE):
-            energy_current = await page.locator(
-                '//*[@id="__nuxt"]/div/main/div/div[5]/div[1]/span').text_content()
-            energy_current = energy_current.replace(" ", "")
-            await multy_tap(
-                page=page,
-                semaphore=10,
-                taps=10,
-                locator='//*[@id="__nuxt"]/div/main/div/div[3]',
-            )
-
-            count += 1
-
-            if count == TAP_PAUSE - 1:
-                time.sleep(1)
-            if int(energy_current) < 10:
-                time.sleep(1)
-                await browser.close()
-                return True
+            return True
 
 
 async def main():
@@ -96,7 +88,7 @@ cron_config: cron = dict(
     coroutine=process,
     hour={i for i in range(0, 25, 3)},
     minute={46},
-    run_at_startup=CRON_RUN_AT_STARTUP_TAP,
+    run_at_startup=True,
     timeout=2 * 60,
     unique=True,
     name=NAME,
