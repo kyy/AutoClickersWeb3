@@ -8,14 +8,26 @@ from fu import start_page_at_phone, create_proccess, multy_tap
 from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 
 NAME = __name__.split('.')[-1]
-TELEGRAM_URL = "https://web.telegram.org/k/#@token1win_bot"
+TELEGRAM_URL = "https://web.telegram.org/k/#@richteddy_bot"
 URL = os.getenv(f"{NAME.upper()}_URL")
 
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
+    start_time = time.time()
+    duration = 50 * 60
 
-    pass
+    while True:
+        elapsed_time = time.time() - start_time
+        # if elapsed_time > duration:
+        #     await browser.close()
+        await multy_tap(
+            page=page,
+            semaphore=25,
+            taps=2,
+            locator='//*[@id="root"]/div[2]/div[4]',
+        )
+
 
 
 async def main():
@@ -46,8 +58,8 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
             playwright=playwright,
             browser_context={"storage_state": "web_telegram.json"},
         )
-
-        await page.get_by_role("button").filter(has_text="Играть").last.click()
+        time.sleep(2)
+        await page.get_by_role("link").filter(has_text="Играть").last.click(timeout=1500)
         time.sleep(2)
         await page.get_by_role("button", name="Launch").click()
 
