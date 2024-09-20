@@ -21,7 +21,7 @@ async def run(playwright: Playwright):
         pass
     time.sleep(1)
     try:
-        await page.get_by_role("button").filter(has_text="Start farming").tap()
+        await page.get_by_role("button").filter(has_text="Start").tap()
     except:
         pass
 
@@ -71,7 +71,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 1)},
+    hour={i for i in range(0, 25, 2)},
     minute={10},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     timeout=10 * 60,

@@ -30,7 +30,7 @@ async def run(playwright: Playwright):
 
     elapsed_time = time.time() - start_time
 
-    for i in range(100):
+    for i in range(200):
         if elapsed_time > duration:
             await browser.close()
 
@@ -40,6 +40,16 @@ async def run(playwright: Playwright):
             taps=2,
             locator='g:nth-child(7) > image',
         )
+
+    try:
+        for _ in range(7):
+            await page.get_by_role("button").filter(has_text="yes").tap()
+            time.sleep(2)
+
+    except:
+        pass
+    finally:
+        await page.get_by_role("button").filter(has_text="claim").tap()
 
     await browser.close()
 

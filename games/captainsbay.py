@@ -29,7 +29,10 @@ async def run(playwright: Playwright):
         pass
     time.sleep(2)
 
-    await page.get_by_role("button", name="Пропустить").tap()
+    try:
+        await page.get_by_role("button", name="Пропустить").tap()
+    except:
+        pass
 
     time.sleep(2)
 
