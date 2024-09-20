@@ -59,14 +59,19 @@ async def get_telegram_storage_state(playwright: Playwright) -> None:
     if not os.path.exists(STORAGE_STATE_NAME):
         browser, page = await start_page_at_phone(playwright=playwright, url=TELEGRAM_URL, mobile=False)
         time.sleep(2)
-        await page.locator('xpath=//*[@id="auth-qr-form"]/div/button[1]').click()  # next
+        await page.get_by_text("LOG IN BY PHONE NUMBER").click()  # next
         time.sleep(1)
         number = page.locator('xpath=//*[@id="sign-in-phone-number"]')  # phone number
+        code = page.locator('xpath=//*[@id="sign-in-phone-code"]')  # phone code
         await number.clear()
+        await code.clear()
+        time.sleep(1)
+        await code.press_sequentially("belarus")
+        time.sleep(1)
         await number.press_sequentially(PHONE_NUMBER)
-        await page.locator('xpath=//*[@id="auth-phone-number-form"]/div/form/button[1]/div').click()  # next
-        # await page.locator('xpath=//*[@id="sign-in-code"]').press_sequentially(input("sms code:"))
-        await asyncio.sleep(30)
+        time.sleep(1)
+        await page.get_by_role("button", name="next").click()  # next
+        await asyncio.sleep(60)
         await page.context.storage_state(path=STORAGE_STATE_NAME)
         await browser.close()
 
@@ -123,7 +128,7 @@ async def multy_tap(page: async_playwright, taps: int, locator: str, semaphore: 
             else:
                 await page.locator(locator).click(force=True)
 
-    task_tap = [asyncio.ensure_future(one_tap()) for tap in range(taps)]
+    task_tap = [asyncio.gather(one_tap()) for tap in range(taps)]
     await asyncio.gather(*task_tap)
 
 
@@ -146,4 +151,11 @@ async def get_canonic_full_game_url(page, browser):
 
 
 if __name__ == '__main__':
-    pass
+    """Получаем сессию телеграаммма, 
+    если сессия не работает или ее нужно обновить - 
+    удалите файл "web_telegram.jsno" перед запуском скрипта"""
+
+    async def main():
+        async with async_playwright() as playwright:
+            await get_telegram_storage_state(playwright)
+    asyncio.run(main())
