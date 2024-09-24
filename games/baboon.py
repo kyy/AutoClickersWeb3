@@ -10,10 +10,10 @@ from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 
 NAME = __name__.split('.')[-1]
 TELEGRAM_URL = "https://web.telegram.org/k/#@TheBaboon_Bot"
-URL = os.getenv(f"{NAME.upper()}_URL")
 
 
 async def run(playwright: Playwright):
+    URL = os.getenv(f"{NAME.upper()}_URL")
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     try:
         await page.get_by_role("button").filter(has_text="получить").tap()

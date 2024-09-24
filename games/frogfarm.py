@@ -9,11 +9,11 @@ from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 
 NAME = __name__.split('.')[-1]
 TELEGRAM_URL = "https://web.telegram.org/k/#@frogfarmbot"
-URL = os.getenv(f"{NAME.upper()}_URL")
 TAP_PAUSE = 1000
 
 
 async def run(playwright: Playwright):
+    URL = os.getenv(f"{NAME.upper()}_URL")
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
 
     try:

@@ -10,11 +10,10 @@ from games.__const import CRON_RUN_AT_STARTUP_URL, CRON_RUN_AT_STARTUP_TAP
 
 NAME = __name__.split('.')[-1]
 TELEGRAM_URL = "https://web.telegram.org/k/#@muskempire_bot"
-URL = os.getenv(f"{NAME.upper()}_URL")
-TAP_PAUSE = 1000
 
 
 async def run(playwright: Playwright):
+    URL = os.getenv(f"{NAME.upper()}_URL")
     browser, page = await start_page_at_phone(url=URL, playwright=playwright, timeout=3)
 
     try:
@@ -22,25 +21,12 @@ async def run(playwright: Playwright):
     except:
         await browser.close()
     start_time = time.time()
-    duration = 30 * 60
+    duration = 2 * 60
     while True:
         elapsed_time = time.time() - start_time
         if elapsed_time > duration:
             await browser.close()
-        count = 0
-        energy_current = 125
-
         await page.locator('//*[@id="oreol"]').tap()
-        energy_current -= 1
-
-        count += 1
-
-        if count == TAP_PAUSE - 1:
-            time.sleep(1)
-        if int(energy_current) < 10:
-            time.sleep(1)
-            await browser.close()
-            return True
 
 
 async def main(ctx=None):
@@ -78,7 +64,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 4)},
+    hour={i for i in range(0, 25, 1)},
     minute={55},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     timeout=5 * 60,

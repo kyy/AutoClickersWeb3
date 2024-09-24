@@ -9,18 +9,18 @@ from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 
 NAME = __name__.split('.')[-1]
 TELEGRAM_URL = "https://web.telegram.org/k/#@hash_cats_bot"
-URL = os.getenv(f"{NAME.upper()}_URL")
 TAP_PAUSE = 1000
 
 
 async def run(playwright: Playwright):
+    URL = os.getenv(f"{NAME.upper()}_URL")
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     try:
-        await page.get_by_role("button", name="Claim $HASH!").tap()
+        await page.get_by_role("button", name="Собрать $HASH!").tap(timeout=1000)
     except:
         pass
     start_time = time.time()
-    duration = 30 * 60
+    duration = 5 * 60
     while True:
         elapsed_time = time.time() - start_time
         if elapsed_time > duration:
