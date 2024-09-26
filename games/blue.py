@@ -9,38 +9,58 @@ from fu import start_page_at_phone, create_proccess, multy_tap, get_canonic_full
 from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 
 NAME = __name__.split('.')[-1]
-TELEGRAM_URL = "https://web.telegram.org/k/#@ArtiTapBot"
+TELEGRAM_URL = "https://web.telegram.org/k/#@bluefarming_bot"
 URL = os.getenv(f"{NAME.upper()}_URL")
 
 
 async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
-    try:
-        await page.get_by_role("button", name="Claim").tap()
-    except:
-        pass
+
+    await page.get_by_role("link", name="missions").tap()
     time.sleep(2)
 
-    for _ in range(4):
-        await page.locator('//*[@id="app"]/div/div[2]/div/div[2]/div/div[6]/div/button').tap()
-        time.sleep(1)
+    ad_count = await page.locator('//*[@id="root"]/div[2]/div/div[2]/div[1]/div/div/div/div/span[1]').text_content()
+    ad_count = int(ad_count.split("/")[0].replace("[", ""))
 
-    await page.get_by_role("button", name="Start").tap()
+    if ad_count > 0:
+        for _ in range(ad_count):
+            await page.locator('//*[@id="root"]/div[2]/div/div[2]/div[1]/div/div/button').tap()
+            time.sleep(1)
+            try:
+                await page.get_by_role("button").filter(has_text="ok").tap(timeout=500)
+            except:
+                pass
+            finally:
+                await page.locator('//*[@id="root"]/div[2]/div/div[2]/div[1]/div/div/button').tap()
+
+            time.sleep(20)
+            await page.locator('//*[@id="root"]/div[2]/div/div[2]/div[1]/div/div/button').tap()
+            time.sleep(3)
+            try:
+                await page.get_by_role("button").filter(has_text="reward").tap(timeout=500)
+            except:
+                pass
+
 
     start_time = time.time()
-    duration = 3 * 60
-
+    duration = 10 * 60
+    await page.get_by_role("link", name="home").tap()
     while True:
-        energy = await page.locator('//*[@id="app"]/div/div[2]/div/div[2]/div[1]/div[1]/div[1]/div[1]').text_content()
-        energy = int(energy.split(" / ")[0].replace(" ", ""))
+        energy = await page.locator('//*[@id="root"]/div[2]/div/div/div[1]/div/span/span').text_content()
+        energy = int(energy)
+
         elapsed_time = time.time() - start_time
-        if any([elapsed_time > duration, energy < 50]):
+
+        if any([elapsed_time > duration, energy < 10]):
+            await page.get_by_role("button").filter(has_text="claim").tap()
+            time.sleep(2)
             await browser.close()
+
         await multy_tap(
             page=page,
-            semaphore=10,
-            taps=10,
-            locator='//*[@id="app"]/div/div[2]/div/div[2]/div[2]/img',
+            semaphore=20,
+            taps=2,
+            locator='//*[@id="root"]/div[2]/div/div/div[2]/div/div[1]',
         )
 
 
@@ -79,9 +99,9 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 2)},
+    hour={i for i in range(0, 25, 1)},
     minute={50},
-    run_at_startup=CRON_RUN_AT_STARTUP_TAP,
+    run_at_startup=True,
     timeout=5 * 60,
     unique=True,
     name=NAME,
