@@ -9,10 +9,10 @@ from games.__const import CRON_RUN_AT_STARTUP_TAP, CRON_RUN_AT_STARTUP_URL
 
 NAME = __name__.split('.')[-1]
 TELEGRAM_URL = "https://web.telegram.org/k/#@richteddy_bot"
-URL = os.getenv(f"{NAME.upper()}_URL")
 
 
 async def run(playwright: Playwright):
+    URL = os.getenv(f"{NAME.upper()}_URL")
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     start_time = time.time()
     duration = 58 * 60
@@ -27,7 +27,6 @@ async def run(playwright: Playwright):
             taps=2,
             locator='//*[@id="root"]/div[2]/div[4]',
         )
-
 
 
 async def main():
