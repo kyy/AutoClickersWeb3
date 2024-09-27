@@ -8,7 +8,6 @@ from dotenv import set_key
 
 from telethon.sync import TelegramClient
 from telethon.sessions import StringSession
-from tqdm import tqdm
 
 from dotenv_config import l_dot_env
 from games.__const import HEADLESS
@@ -138,10 +137,12 @@ async def get_canonic_full_game_url(page, browser):
     :return: обновляем ссылки игр содержащих временный токен
     """
     time.sleep(4)
+
     await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
     await page.locator('//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]').click()  # burger
     time.sleep(2)
-    await page.locator('xpath=/html/body/div[7]/div/div[2]/button[1]/div').click()  # launch
+    await page.pause()
+    await page.get_by_role("button", name="Launch", exact=True).click()  # launch
     time.sleep(2)
     iframe = await page.wait_for_selector('iframe')
     time.sleep(1)
@@ -155,7 +156,10 @@ if __name__ == '__main__':
     если сессия не работает или ее нужно обновить - 
     удалите файл "web_telegram.jsno" перед запуском скрипта"""
 
+
     async def main():
         async with async_playwright() as playwright:
             await get_telegram_storage_state(playwright)
+
+
     asyncio.run(main())
