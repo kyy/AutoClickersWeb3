@@ -12,6 +12,8 @@ from telethon.sessions import StringSession
 from dotenv_config import l_dot_env
 from games.__const import HEADLESS
 
+l_dot_env()
+
 TELEGRAM_URL = "https://web.telegram.org/a/"
 PHONE_NUMBER = os.getenv("PHONE")
 API_ID = int(os.getenv("API_ID"))
