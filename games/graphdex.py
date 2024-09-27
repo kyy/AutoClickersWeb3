@@ -16,12 +16,12 @@ async def run(playwright: Playwright):
     URL = os.getenv(f"{NAME.upper()}_URL")
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     try:
-        await page.get_by_role("button").filter(has_text="Claim").tap(timeout=1500)
+        await page.get_by_role("button").filter(has_text="Claim").tap(timeout=3000)
     except:
         pass
-    time.sleep(1)
+    time.sleep(3)
     try:
-        await page.get_by_role("button").filter(has_text="Start").tap(1500)
+        await page.get_by_role("button").filter(has_text="Start").tap(timeout=3000)
     except:
         pass
     await browser.close()

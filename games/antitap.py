@@ -15,14 +15,14 @@ TELEGRAM_URL = "https://web.telegram.org/k/#@ArtiTapBot"
 async def run(playwright: Playwright):
     URL = os.getenv(f"{NAME.upper()}_URL")
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
+
     try:
         await page.get_by_role("button", name="Claim").tap()
     except:
         pass
     time.sleep(2)
-
     for _ in range(4):
-        await page.locator('//*[@id="app"]/div/div[2]/div/div[2]/div/div[6]/div/button').tap()
+        await page.get_by_role("button").first.tap()
         time.sleep(1)
 
     await page.get_by_role("button", name="Start").tap()
@@ -31,7 +31,7 @@ async def run(playwright: Playwright):
     duration = 3 * 60
 
     while True:
-        energy = await page.locator('//*[@id="app"]/div/div[2]/div/div[2]/div[1]/div[1]/div[1]/div[1]').text_content()
+        energy = await page.locator('.user-energy-stat__value').text_content()
         energy = int(energy.split(" / ")[0].replace(" ", ""))
         elapsed_time = time.time() - start_time
         if any([elapsed_time > duration, energy < 50]):
@@ -40,7 +40,7 @@ async def run(playwright: Playwright):
             page=page,
             semaphore=10,
             taps=10,
-            locator='//*[@id="app"]/div/div[2]/div/div[2]/div[2]/img',
+            locator='#canvas',
         )
 
 

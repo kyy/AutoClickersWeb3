@@ -18,17 +18,23 @@ async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
 
     try:
-        await page.get_by_role("button", name="Recieve").tap()  # claim
+        await page.get_by_role("button", name="Recieve").tap(timeout=2500)  # claim
         time.sleep(2)
-        await page.get_by_role("button").filter(has_text="Claim").tap()  # claim
+    except:
+        pass
+    try:
+        await page.get_by_role("button").filter(has_text="Claim").tap(timeout=2500)  # claim
         time.sleep(2)
-        await page.get_by_role("button").filter(has_text="Activate").tap()  # claim
+    except:
+        pass
+    try:
+        await page.get_by_role("button").filter(has_text="Activate").tap(timeout=2500)  # claim
     except:
         pass
     try:
         await page.locator("a:nth-child(4)").tap()
         time.sleep(1)
-        await page.get_by_role("button").filter(has_text="claim").tap()
+        await page.get_by_role("button").filter(has_text="claim").tap(timeout=2500)
     except:
         pass
 

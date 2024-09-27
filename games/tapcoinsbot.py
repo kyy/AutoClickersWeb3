@@ -15,7 +15,10 @@ TAP_PAUSE = 1000
 async def run(playwright: Playwright):
     URL = os.getenv(f"{NAME.upper()}_URL")
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
-
+    await page.get_by_text("GO").tap(timeout=1500)
+    await page.goto('https://game.tapcoins.app/')
+    time.sleep(2)
+    await page.get_by_text("thank you").tap()
     time.sleep(2)
     await browser.close()
 
@@ -53,7 +56,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
         time.sleep(2)
         await page.get_by_role("button", name="Launch").click()
 
-        time.sleep(2)
+        time.sleep(4)
 
         iframe = await page.wait_for_selector('iframe')
         src = await iframe.get_attribute('src')

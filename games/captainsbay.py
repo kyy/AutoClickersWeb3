@@ -18,19 +18,19 @@ async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright, timeout=2)
 
     try:
-        await page.get_by_role("button").filter(has_text="Забрать").tap()  # clime
+        await page.get_by_role("button").filter(has_text="Забрать").tap(timeout=3000)  # clime
     except:
         pass
 
     time.sleep(2)
     try:
-        await page.get_by_role("button").filter(has_text="Начать майнинг").tap()  # start mining
+        await page.get_by_role("button").filter(has_text="Начать майнинг").tap(timeout=3000)  # start mining
     except:
         pass
     time.sleep(2)
 
     try:
-        await page.get_by_role("button", name="Пропустить").tap()
+        await page.get_by_role("button", name="Пропустить").tap(timeout=3000)
     except:
         pass
 
