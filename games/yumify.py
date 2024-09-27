@@ -40,6 +40,11 @@ async def run(playwright: Playwright):
     except:
         pass
 
+    try:
+        await iframe.get_by_role("button", name="Collect").click()
+    except:
+        pass
+
     while True:
         elapsed_time = time.time() - start_time
         if elapsed_time > duration:

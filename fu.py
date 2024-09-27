@@ -141,13 +141,13 @@ async def get_canonic_full_game_url(page, browser):
     await page.wait_for_selector('xpath=//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]')
     await page.locator('//*[@id="column-center"]/div/div/div[4]/div/div[1]/div/div[8]/div[1]').click()  # burger
     time.sleep(2)
-    await page.pause()
     await page.get_by_role("button", name="Launch", exact=True).click()  # launch
     time.sleep(2)
     iframe = await page.wait_for_selector('iframe')
     time.sleep(1)
     src = await iframe.get_attribute('src')
     await browser.close()
+    print(src)
     return src
 
 

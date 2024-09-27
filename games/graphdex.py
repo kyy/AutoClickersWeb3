@@ -16,16 +16,15 @@ async def run(playwright: Playwright):
     URL = os.getenv(f"{NAME.upper()}_URL")
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     try:
-        await page.get_by_role("button").filter(has_text="Claim").tap()
+        await page.get_by_role("button").filter(has_text="Claim").tap(timeout=1500)
     except:
         pass
     time.sleep(1)
     try:
-        await page.get_by_role("button").filter(has_text="Start").tap()
+        await page.get_by_role("button").filter(has_text="Start").tap(1500)
     except:
         pass
-
-    await page.pause()
+    await browser.close()
 
 
 async def main():
@@ -71,7 +70,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 2)},
+    hour={i for i in range(0, 25, 1)},
     minute={10},
     run_at_startup=CRON_RUN_AT_STARTUP_TAP,
     timeout=10 * 60,

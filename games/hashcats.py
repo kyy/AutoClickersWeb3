@@ -16,36 +16,39 @@ async def run(playwright: Playwright):
     URL = os.getenv(f"{NAME.upper()}_URL")
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     try:
-        await page.get_by_role("button", name="Собрать $HASH!").tap(timeout=1000)
+        time.sleep(10)
+        await page.get_by_role("button").filter(has_text="Собрать").tap(timeout=1000)
     except:
         pass
-    start_time = time.time()
-    duration = 5 * 60
-    while True:
-        elapsed_time = time.time() - start_time
-        if elapsed_time > duration:
-            await browser.close()
-        count = 0
-        for i in range(TAP_PAUSE):
-            energy_current = await page.locator(
-                '//*[@id="game"]/div[6]/div[2]/div').text_content()
-            energy_current = energy_current.split(" / ")[0].replace("\xa0", "")
+    try:
+        time.sleep(2)
+        await page.get_by_role("button").filter(has_text="Собрать").tap(timeout=1000)
+    except:
+        pass
 
-            await multy_tap(
-                page=page,
-                semaphore=10,
-                taps=10,
-                locator='//*[@id="game"]/div[1]',
-            )
+    try:
+        time.sleep(2)
+        await page.get_by_role("button").filter(has_text="Крутить").tap(timeout=1000)
+        time.sleep(10)
+    except:
+        pass
 
-            count += 1
+    spins = await page.locator('//*[@id="chakra-modal-:re:"]/div[3]/div[3]/div[1]/div/div[2]').text_content()
+    spins = int(spins)
+    if spins > 0:
+        for _ in range(spins):
+            try:
+                time.sleep(2)
+                await page.wait_for_selector('//*[@id="chakra-modal-:re:"]/div[3]/button')
+                await page.get_by_role("button").filter(has_text="Вращать").tap()
+                time.sleep(5)
+                await page.wait_for_selector('//*[@id="chakra-modal-:re:"]/div[4]/div[2]/div/div/div/div[2]/button')
+                await page.get_by_role("button").filter(has_text="Собрать").tap()
+                time.sleep(2)
+            except:
+                pass
 
-            if count == TAP_PAUSE - 1:
-                time.sleep(1)
-            if int(energy_current) < 10:
-                time.sleep(1)
-                await browser.close()
-                return True
+    await page.close()
 
 
 async def main():

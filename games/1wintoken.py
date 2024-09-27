@@ -51,7 +51,7 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
             playwright=playwright,
             browser_context={"storage_state": "web_telegram.json"},
         )
-
+        await page.pause()
         await page.get_by_role("button", name="Играть").last.click()
         time.sleep(2)
         await page.get_by_role("button", name="Launch").click()
