@@ -12,8 +12,6 @@ from telethon.sessions import StringSession
 from dotenv_config import l_dot_env
 from games.__const import HEADLESS
 
-l_dot_env()
-
 TELEGRAM_URL = "https://web.telegram.org/a/"
 PHONE_NUMBER = os.getenv("PHONE")
 API_ID = int(os.getenv("API_ID"))
@@ -23,6 +21,7 @@ PATH_TO_GAMES = "games"
 
 
 async def start_page_at_phone(playwright: Playwright, url: str, browser_context: dict = None, mobile=True, timeout=5):
+    l_dot_env()
     context = {}
     if mobile:
         context = playwright.devices['Pixel 7']
