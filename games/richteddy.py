@@ -15,7 +15,7 @@ async def run(playwright: Playwright):
     URL = os.getenv(f"{NAME.upper()}_URL")
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     start_time = time.time()
-    duration = 12 * 58 * 60
+    duration = 23 * 58 * 60
 
     while True:
         elapsed_time = time.time() - start_time
@@ -74,10 +74,9 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 12)},
-    minute={12},
-    run_at_startup=True,
-    timeout=58 * 60,
+    hour={16},
+    minute={55},
+    run_at_startup=False,
     unique=True,
     name=NAME,
     job_id=f'{NAME}_001',

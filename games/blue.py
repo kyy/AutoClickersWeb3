@@ -18,9 +18,11 @@ async def run(playwright: Playwright):
 
     await page.get_by_role("link", name="missions").tap()
     time.sleep(2)
-
-    ad_count = await page.locator('//*[@id="root"]/div[2]/div/div[2]/div[1]/div/div/div/div/span[1]').text_content()
-    ad_count = int(ad_count.split("/")[0].replace("[", ""))
+    try:
+        ad_count = await page.locator('//*[@id="root"]/div[2]/div/div[2]/div[1]/div/div/div/div/span[1]').text_content()
+        ad_count = int(ad_count.split("/")[0].replace("[", ""))
+    except:
+        ad_count = 0
 
     if ad_count > 0:
         for _ in range(ad_count):
@@ -40,7 +42,6 @@ async def run(playwright: Playwright):
                 await page.get_by_role("button").filter(has_text="reward").tap(timeout=500)
             except:
                 pass
-
 
     start_time = time.time()
     duration = 10 * 60
@@ -99,10 +100,9 @@ async def refresh_game_url(playwright: Playwright, run=CRON_RUN_AT_STARTUP_URL):
 
 cron_config: cron = dict(
     coroutine=process,
-    hour={i for i in range(0, 25, 12)},
-    minute={50},
-    run_at_startup=True,
-    timeout=5 * 60,
+    hour={i for i in range(0, 25, 4)},
+    minute={55},
+    run_at_startup=False,
     unique=True,
     name=NAME,
     job_id=f'{NAME}_001',
