@@ -8,6 +8,7 @@ from dotenv import set_key
 
 from telethon.sync import TelegramClient
 from telethon.sessions import StringSession
+from tqdm import tqdm
 
 from dotenv_config import l_dot_env
 from games.__const import HEADLESS
@@ -51,7 +52,7 @@ def get_telegram_session():
         set_key(dotenv_path=".env", key_to_set="SESSION_STRING", value_to_set=string)
 
 
-async def get_telegram_storage_state(playwright: Playwright) -> None:
+async def get_telegram_storage_state(playwright: Playwright) -> bool:
     """
     :param playwright:
     :return: сохраняем сессию браузера: "web.telegram" в формате .json
@@ -60,20 +61,16 @@ async def get_telegram_storage_state(playwright: Playwright) -> None:
         browser, page = await start_page_at_phone(playwright=playwright, url=TELEGRAM_URL, mobile=False)
         time.sleep(2)
         await page.get_by_text("LOG IN BY PHONE NUMBER").click()  # next
-        time.sleep(1)
-        number = page.locator('xpath=//*[@id="sign-in-phone-number"]')  # phone number
-        code = page.locator('xpath=//*[@id="sign-in-phone-code"]')  # phone code
-        await number.clear()
-        await code.clear()
-        time.sleep(1)
-        await code.press_sequentially("belarus")
-        time.sleep(1)
-        await number.press_sequentially(PHONE_NUMBER)
-        time.sleep(1)
-        await page.get_by_role("button", name="next").click()  # next
-        await asyncio.sleep(60)
-        await page.context.storage_state(path=STORAGE_STATE_NAME)
-        await browser.close()
+
+        a = input(
+            "Аfter filling information in browser click 'next', confirm pin code, write 'save' in console for saving session (save/break)")
+        if a == 'save':
+            await page.context.storage_state(path=STORAGE_STATE_NAME)
+            await browser.close()
+            return True
+        elif a == 'break':
+            await browser.close()
+            return False
 
 
 def get_fu_refresh_game_urls_name() -> list:
@@ -158,9 +155,32 @@ if __name__ == '__main__':
     удалите файл "web_telegram.jsno" перед запуском скрипта"""
 
 
-    async def main():
+    async def storage_state():
         async with async_playwright() as playwright:
             await get_telegram_storage_state(playwright)
 
 
-    asyncio.run(main())
+    async def urls():
+        async with async_playwright() as playwright:
+            for fu_name in tqdm(get_fu_refresh_game_urls_name(), desc='urls'):
+                try:
+                    fu, name = fu_name
+                    src: str = await fu(playwright, True)
+                except Exception as e:
+                    print(f'error >> {name} {e}')
+                finally:
+                    if src != "" and src is not False:
+                        set_key(dotenv_path=".env", key_to_set=name.upper() + "_URL",
+                                value_to_set=src.replace("tgWebAppPlatform=web", "tgWebAppPlatform=ios"))
+                    elif src == "":
+                        pass
+                    elif src is False:
+                        pass
+
+
+    state = asyncio.run(storage_state())
+
+    if state:
+        asyncio.run(urls())
+    else:
+        print('restart plz')
