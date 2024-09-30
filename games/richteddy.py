@@ -24,7 +24,7 @@ async def run(playwright: Playwright):
         await multy_tap(
             page=page,
             semaphore=30,
-            taps=2,
+            taps=8,
             locator='//*[@id="root"]/div[2]/div[4]',
         )
 
@@ -76,7 +76,7 @@ cron_config: cron = dict(
     coroutine=process,
     hour={16},
     minute={55},
-    run_at_startup=False,
+    run_at_startup=True,
     unique=True,
     name=NAME,
     job_id=f'{NAME}_001',
