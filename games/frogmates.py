@@ -14,7 +14,6 @@ TELEGRAM_URL = "https://web.telegram.org/k/#@Frogmates_bot"
 async def run(playwright: Playwright):
     URL = os.getenv(f"{NAME.upper()}_URL")
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
-    await page.pause()
 
     try:
         await page.get_by_role("link", name="Rewards").tap(timeout=2000)
