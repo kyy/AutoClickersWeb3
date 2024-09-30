@@ -16,7 +16,7 @@ from games.__const import HEADLESS
 l_dot_env()
 
 TELEGRAM_URL = "https://web.telegram.org/a/"
-PHONE_NUMBER = os.getenv("PHONE")
+
 API_ID = int(os.getenv("API_ID"))
 API_HASH = os.getenv("API_HASH")
 STORAGE_STATE_NAME = "web_telegram.json"

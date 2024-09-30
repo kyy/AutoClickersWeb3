@@ -4,6 +4,10 @@ for Windows:
 - to run browsers in the background mode: '__const.py': 'HEADLESS = True'
 - edit 'cron_configs' of games to change frequency and time of starting (https://arq-docs.helpmanual.io/).
 
+create '.env' file, xxx- telegram api hash, telegram api id (https://my.telegram.org/auth):
+API_ID="XXX"
+API_HASH="YYY"
+
 1. install redis (https://github.com/redis-windows/redis-windows)
 2. 'redis-server' (start redis server)
 3. 'python3 -m venv .venv'
