@@ -1,10 +1,10 @@
 for Windows:
 
-- for excluding game from task: add '__' in name of file (exbpl: '__1winroken.py')
+- for excluding game from task: add '__' in name of file (exmple: '__1wintoken.py')
 - to run browsers in the background mode: '__const.py': 'HEADLESS = True'
 - edit 'cron_configs' of games to change frequency and time of starting (https://arq-docs.helpmanual.io/).
 
-create '.env' file, zzz - phone number (exmple : '375290000000), xxx- telegram api hash, telegram api
+create '.env' file, zzz - phone number (exmple : '375290000000), yyy - telegram api hash, xxx - telegram api
 id (https://my.telegram.org/auth):
 
 - API_ID="XXX"
