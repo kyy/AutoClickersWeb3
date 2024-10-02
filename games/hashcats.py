@@ -17,24 +17,28 @@ async def run(playwright: Playwright):
     browser, page = await start_page_at_phone(url=URL, playwright=playwright)
     try:
         time.sleep(10)
-        await page.get_by_role("button").filter(has_text="Собрать").tap(timeout=1000)
+        await page.get_by_role("button").filter(has_text="Собрать").tap(timeout=2000)
     except:
         pass
     try:
         time.sleep(2)
-        await page.get_by_role("button").filter(has_text="Собрать").tap(timeout=1000)
+        await page.get_by_role("button").filter(has_text="Собрать").tap(timeout=2000)
     except:
         pass
 
     try:
         time.sleep(2)
-        await page.get_by_role("button").filter(has_text="Крутить").tap(timeout=1000)
+        await page.get_by_role("button").filter(has_text="Крутить").tap(timeout=2000)
         time.sleep(10)
     except:
         pass
 
-    spins = await page.locator('//*[@id="chakra-modal-:re:"]/div[3]/div[3]/div[1]/div/div[2]').text_content()
-    spins = int(spins)
+    try:
+        spins = await page.locator('//*[@id="chakra-modal-:re:"]/div[3]/div[3]/div[1]/div/div[2]').text_content()
+        spins = int(spins)
+    except:
+        spins = 0
+
     if spins > 0:
         for _ in range(spins):
             try:

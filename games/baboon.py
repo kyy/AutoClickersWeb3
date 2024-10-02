@@ -28,7 +28,7 @@ async def run(playwright: Playwright):
         pass
 
     start_time = time.time()
-    duration = 30 * 60
+    duration = 5 * 60
     energy = await page.locator('//*[@id="root"]/main/div/div[3]/button[2]/div/div').text_content()
     energy = energy.split(".")[0]
     while True:
